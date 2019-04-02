@@ -1,0 +1,53 @@
+{
+    "test最最" : "TT123",
+    "mixArr": [ 23, 45, 23, "ab,最c", {"test": "ab,最c", "test1": "AB最C"}, [ 2, "ab最c", 3],  "ab,最c", {"p2":  "v2最"}, [ 22, 33], ",ab最c", "def最"],
+    "numArr": [ 23, 45, 23, 34.5 ],
+    "strArr": [ "s23", "s45", "", "s23" ],
+    "objArr": [ { "root1" : "value1", "root2" : "value2" }, { "root1" : "value2" }, { "root1" : "value3" } ],
+    "arrArr": [ [ 1,2,3 ], [4, 5 ], [ 6], [], ["7"] ],
+    "arrCplxArr": [ [ { "root11" : "value11" }, { "root22" : "value22" } ], [ {} ] ],
+    "test": "最最最",
+    "test1": 123,
+    "actor" : {
+        "name": "Team 最 PB",
+        "mbox": "mailto:teampb@example.com",
+        "simple": [ 1, 3, 4, 5 ],
+        "member": [
+            {
+                "innerArr": [1, 2, 3],
+                "name": "Andrew 最 Downes",
+                "account": {
+                    "homePage": "http://www.example1.com",
+                    "name": "13936749111"
+                },
+                "openid": "http://toby.openid.example1.org/",
+                "mbox_sha1sum": "eb最d31e95054c018b10727ccffd2ef2ec3a016ee9111",
+                "objectType": "Agent"
+            },
+            {
+                "innerArr": [4, 5, 6, 7],
+                "name": "Toby 最 Nichols",
+                "account": {
+                    "homePage": "http://www.example2.com",
+                    "name": "13936749222 最"
+                },
+                "openid": "http://toby.openid.example2.org/",
+                "mbox_sha1sum": "ebd31e95054c018b1072最7ccffd2ef2ec3a016ee9222",
+                "objectType": "Agent"
+            },
+            {
+                "innerArr": [8],
+                "name": "Ena Hills 最",
+                "account": {
+                    "homePage": "http://www.example3.com",
+                    "name": "13936749333 最"
+                },
+                "openid": "http://toby.openid.example3.org/",
+                "mbox_sha1sum": "ebd31e95054c018b10727ccffd2ef2ec3a016ee9333 最",
+                "objectType": "Agent"
+            }
+        ],
+        "objectType": "Group最"
+    },
+    "test2": 555
+}
