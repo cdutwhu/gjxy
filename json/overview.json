@@ -62,7 +62,7 @@
         },
         {
             "skill": "reflect on their learning and suggest responses to their findings",
-            "ac": ["ACHGS012", "ACHGS018"]
+            "ac": ["ACHGS012", "ACHGS018", "ACHGS019"]
         }]
     }],
     "tools": [

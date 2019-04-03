@@ -7,6 +7,23 @@ import (
 
 func TestJSONChild(t *testing.T) {
 
+	jsonBytes, _ := ioutil.ReadFile("./json/content.json") // only LF at end of line
+	s := Str(jsonBytes)
+	s.SetEnC()
+
+	{
+		fPln(JSONXPathValue(s, "abc ~ subject", " ~ ", 1, 1))
+		fPln(JSONXPathValue(s, "subject", " ~ ", 1))
+
+		// mapFT := &map[string][]string{}
+		// JSONFamilyTree(s, "xapi", " ~ ", mapFT)
+		// fPln(mapFT)
+
+		fPln(" ----------------------------------------------- ")
+
+		JSONArrInfo(s, "xapi", " ~ ", "id", nil)
+	}
+
 	// jsonSample := Str(` [ 1, "a", 123, ["ab"], true, false, true, null, null ] `)
 	// fPln(jsonSample.IsJSON())
 	// fPln(jsonSample.IsJSONArray())
@@ -15,10 +32,6 @@ func TestJSONChild(t *testing.T) {
 	// fPln(jsonSample.IsJSONSingle())
 	// fPln(jsonSample.JSONChildValue("root"))
 	// fPln(jsonSample.JSONWrapRoot("Root"))
-
-	jsonBytes, _ := ioutil.ReadFile("./json/content.json") // only LF at end of line
-	s := Str(jsonBytes)
-	s.SetEnC()
 
 	// if !s.IsJSON() {
 	// 	t.Fatalf("JSON Format Error\n")
@@ -68,16 +81,6 @@ func TestJSONChild(t *testing.T) {
 	// 		t.Fatalf("JSONChildren() Error <%d>\n", len(children))
 	// 	}
 	// }
-
-	{
-		fPln(JSONXPathValue(s, "abc ~ subject", " ~ ", 1, 1))
-		fPln(JSONXPathValue(s, "subject", " ~ ", 1))
-
-		mapFT := &map[string][]string{}
-		JSONFamilyTree(s, "xapi", " ~ ", mapFT)
-		// fPln(mapFT)
-	}
-
 }
 
 func TestJSONArrInfo(t *testing.T) {

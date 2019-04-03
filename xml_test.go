@@ -6,7 +6,7 @@ import (
 )
 
 func TestXML(t *testing.T) {
-	sifbytes, _ := ioutil.ReadFile("./sif.xml")
+	sifbytes, _ := ioutil.ReadFile("./xml/sif.xml")
 	sif := Str(sifbytes)
 	sif.SetEnC()
 
@@ -16,6 +16,8 @@ func TestXML(t *testing.T) {
 	fPln(l, r)
 
 	fPln(XMLSegsCount(sif))
+
+	fPln(" --------------------------------------- ")
 
 	tag, xml, l, r = XMLSegPos(sif, 1, 726)
 	fPln(tag)

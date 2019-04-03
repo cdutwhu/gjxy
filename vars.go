@@ -2,6 +2,7 @@ package gjxy
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	u "github.com/cdutwhu/go-util"
@@ -9,7 +10,8 @@ import (
 )
 
 type (
-	Str = w.Str
+	Str  = w.Str
+	Strs = w.Strs
 )
 
 const (
@@ -24,6 +26,10 @@ var (
 	IF = u.IF
 	PC = u.PanicOnCondition
 
+	GetMapKeys = w.GetMapKeys
+
+	sortByLess = sort.Sort
+
 	fEf  = fmt.Errorf
 	fSf  = fmt.Sprintf
 	fPln = fmt.Println
@@ -31,4 +37,5 @@ var (
 	sCtn = strings.Contains
 	sCnt = strings.Count
 	sSpl = strings.Split
+	sJ   = strings.Join	
 )

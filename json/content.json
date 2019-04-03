@@ -2,7 +2,7 @@
     "learning_area": "HSIE",
     "subject": "Geography",
     "stage": "1",
-    "yrLvls" : [1, 2],
+    "yrLvls" : [1, 2, 3],
     "courses" : [
     {
         "name": "Features Of Places",
