@@ -236,9 +236,13 @@ func JSONFamilyTree(s Str, fName, del string, mapFT *map[string][]string) {
 	}
 }
 
-func iPathToPathIndices(ipath, del string) (string, []int) {
+// IPathToPathIndices :
+func IPathToPathIndices(iPath, del string) (string, []int) {
+	if iPath == "" {
+		return "", nil
+	}
 	segs, indices := []string{}, []int{}
-	for _, s := range sSpl(ipath, del) {
+	for _, s := range sSpl(iPath, del) {
 		si := sSpl(s, "#")
 		segs, indices = append(segs, si[0]), append(indices, Str(si[1]).ToInt())
 	}
@@ -246,8 +250,8 @@ func iPathToPathIndices(ipath, del string) (string, []int) {
 }
 
 // JSONArrByIPath :
-func JSONArrByIPath(s Str, ipath, del string, mapFT *map[string][]string) (arrNames []string, arrCnts []int, nextIPaths []string) {
-	path, indices := iPathToPathIndices(ipath, del)
+func JSONArrByIPath(s Str, iPath, del string, mapFT *map[string][]string) (arrNames []string, arrCnts []int, nextIPaths []string) {
+	path, indices := IPathToPathIndices(iPath, del)
 	// fPln("indices:", indices)
 	leaves := (*mapFT)[path]
 	for _, leaf := range leaves {
@@ -255,21 +259,46 @@ func JSONArrByIPath(s Str, ipath, del string, mapFT *map[string][]string) (arrNa
 		sLeaf := Str(leaf)
 		if sLeaf.HP("[]") {
 			arrName := sLeaf.S(2, ALL).V()
-			// fPln(arrName)						 
-			_, nArr := JSONXPathValue(s, path + del + arrName, del, append(indices, 1)...)
+			// fPln(arrName)
+			_, nArr := JSONXPathValue(s, path+del+arrName, del, append(indices, 1)...)
 			// fPln(nArr)
 
 			arrNames = append(arrNames, arrName)
 			arrCnts = append(arrCnts, nArr)
 
-			for i := 1; i <= nArr; i++ {				 
-				nextIPath := ipath + del + arrName + fSf("#%d", i)
+			for i := 1; i <= nArr; i++ {
+				nextIPath := iPath + del + arrName + fSf("#%d", i)
 				// fPln(nextIPath)
 				nextIPaths = append(nextIPaths, nextIPath)
 			}
 		}
 	}
 	return
+}
+
+// JSONWholeArrByIPathByR :
+func JSONWholeArrByIPathByR(s Str, iPath, del, id string, mapFT *map[string][]string, mapIPathNID *map[string]struct {
+	Count int
+	ID    string
+}) {
+
+	PC(mapIPathNID == nil, fEf("result mapIPathNID is not initialized"))
+	arrNames, arrCnts, subIPaths := JSONArrByIPath(s, iPath, del, mapFT)
+	PC(len(arrNames) != len(arrCnts), fEf("error in JSONArrByIPath"))
+
+	nNames := len(arrNames)
+	for i := 0; i < nNames; i++ {
+		(*mapIPathNID)[iPath+del+arrNames[i]] = struct {
+			Count int
+			ID    string
+		}{
+			Count: arrCnts[i],
+			ID:    id,
+		}
+	}
+	for _, subIPath := range subIPaths {
+		JSONWholeArrByIPathByR(s, subIPath, del, id, mapFT, mapIPathNID)
+	}
 }
 
 // JSONArrInfo :
@@ -290,268 +319,18 @@ func JSONArrInfo(s Str, xpath, del, id string, mapFT *map[string][]string) (*map
 	// }
 	// sortByLess(Strs(keys))
 
-	root := ""
-	for _, k := range keys {
-		fPln(k)
-		if !sCtn(k, del) {
-			root = k
-			break
-		}
-	}
-	root += "#1"
+	ok, _, root := IArrSearchOne(Strs(keys), func(i int, a interface{}) (bool, interface{}) { return !sCtn(a.(string), del), a })
+	fPf("ROOT is <%s>\n", root)
+	PC(!ok, fEf("Invalid path"))
 
-	arrNames, arrCnts, nextIPaths := JSONArrByIPath(s, root, del, mapFT)
-	if len(arrNames) > 0 {
-		fPln(root, " ------------------------------------------------- ")
-		fPln(arrNames)
-	}
-	if len(arrCnts) > 0 {
-		fPln(arrCnts)
-	}
-	// fPln(nextIPaths)
-
-	for _, nextIPath := range nextIPaths {
-
-		arrNames, arrCnts, nextIPaths = JSONArrByIPath(s, nextIPath, del, mapFT)
-		if len(arrNames) > 0 {
-			fPln(nextIPath, " ------------------------------------------------- ")
-			fPln(arrNames)
-		}
-		if len(arrCnts) > 0 {
-			fPln(arrCnts)
-		}
-		//fPln(nextIPaths)
-
-		for _, nextIPath := range nextIPaths {
-
-			arrNames, arrCnts, nextIPaths = JSONArrByIPath(s, nextIPath, del, mapFT)
-			if len(arrNames) > 0 {
-				fPln(nextIPath, " ------------------------------------------------- ")
-				fPln(arrNames)
-			}
-			if len(arrCnts) > 0 {
-				fPln(arrCnts)
-			}
-			//fPln(nextIPaths)
-
-			for _, nextIPath := range nextIPaths {
-
-				arrNames, arrCnts, nextIPaths = JSONArrByIPath(s, nextIPath, del, mapFT)
-				if len(arrNames) > 0 {
-					fPln(nextIPath, " ------------------------------------------------- ")
-					fPln(arrNames)
-				}
-				if len(arrCnts) > 0 {
-					fPln(arrCnts)
-				}
-				//fPln(nextIPaths)
-			}
-
-		}
-	}
-
-	return nil, nil
+	iRoot := root.(string) + "#1"
+	mapIPathNID := &map[string]struct {
+		Count int
+		ID    string
+	}{}
+	JSONWholeArrByIPathByR(s, iRoot, del, id, mapFT, mapIPathNID)
+	return mapFT, mapIPathNID
 }
-
-// // JSONArrInfo : Only deal with SAME TYPE element array                                                            ?
-// func JSONArrInfo(s Str, xpath, del, id string, mapFT *map[string][]string) (*map[string][]string, *map[string]struct {
-// 	Count int
-// 	ID    string
-// }) {
-// 	if mapFT == nil {
-// 		mapFT = &map[string][]string{}
-// 		JSONFamilyTree(s, xpath, del, mapFT)
-// 	}
-
-// 	// for k, v := range *mapFT {
-// 	// 	fPln(k, " : ", v)
-// 	// }
-// 	// return nil, nil
-// 	// fPln(" ------------------------------------------------- ")
-
-// 	mapA := map[string]bool{}
-// 	for attr, children := range *mapFT {
-// 		for _, child := range children {
-// 			sChild := Str(child)
-// 			if sChild.HP("[]") {
-// 				sChild = sChild.S(2, ALL)
-// 				path := Str(attr + del + sChild.V()).T(del).V()
-// 				mapA[path] = true
-// 			}
-// 		}
-// 	}
-
-// 	for k, v := range mapA {
-// 		fPln(k, " : ", v)
-// 	}
-// 	//return nil, nil
-
-// 	mapAC := &map[string]struct {
-// 		Count int
-// 		ID    string
-// 	}{}
-
-// 	for k := range mapA {
-// 		if len(sSpl(k, del)) == 1 {
-// 			if _, n := JSONChildValueEx(s, k, 0); n >= 0 {
-// 				(*mapAC)[k] = struct {
-// 					Count int
-// 					ID    string
-// 				}{Count: n, ID: id}
-// 			}
-// 		}
-// 	}
-
-// 	// for k := range mapA {
-// 	// 	ss := sSpl(k, del)
-// 	// 	if len(ss) == 2 {
-// 	// 		s1, s2, s12, s12ns := ss[0], ss[1], sJ(ss, del), []string{}
-// 	// 		if cntid1, ok := (*mapAC)[s1]; ok { //                                ** get upper level's count
-// 	// 			for i := 1; i <= cntid1.Count; i++ {
-// 	// 				s12ns = append(s12ns, fSf("%s#%d%s%s", s1, i, del, s2))
-// 	// 			}
-// 	// 			for i, ns := range s12ns {
-// 	// 				idx := Str(sSpl(sSpl(ns, del)[0], "#")[1]).ToInt()
-// 	// 				_, _, _, n := s.JSONXPathValue(s12, del, []int{idx, 0}...) // ** get this level's count
-// 	// 				(*mapAC)[s12ns[i]] = struct {
-// 	// 					Count int
-// 	// 					ID    string
-// 	// 				}{Count: n, ID: id}
-// 	// 			}
-// 	// 		} else {
-// 	// 			if _, _, _, n := s.JSONXPathValue(s12, del, []int{1, 0}...); n >= 0 {
-// 	// 				(*mapAC)[s12] = struct {
-// 	// 					Count int
-// 	// 					ID    string
-// 	// 				}{Count: n, ID: id}
-// 	// 			}
-// 	// 		}
-// 	// 	}
-// 	// }
-
-// 	// for k := range mapA {
-// 	// 	ss := sSpl(k, del)
-// 	// 	if len(ss) == 3 {
-// 	// 		s1, s1nArr := ss[0], []string{}
-// 	// 		if n1, ok := (*mapAC)[s1]; ok {
-// 	// 			for i := 1; i <= n1.Count; i++ {
-// 	// 				s1nArr = append(s1nArr, fSf("%s#%d", s1, i))
-// 	// 			}
-// 	// 		} else {
-
-// 	// 		}
-
-// 	// 		s2, s1ns2nArr := ss[1], []string{}
-// 	// 		for _, s1n := range s1nArr {
-// 	// 			s1ns2 := s1n + del + s2
-// 	// 			if n12, ok := (*mapAC)[s1ns2]; ok {
-// 	// 				for i := 1; i <= n12.Count; i++ {
-// 	// 					s1ns2nArr = append(s1ns2nArr, fSf("%s#%d", s1ns2, i))
-// 	// 				}
-// 	// 			} else {
-
-// 	// 			}
-// 	// 		}
-
-// 	// 		s3 := ss[2]
-// 	// 		for _, sn := range s1ns2nArr {
-// 	// 			sArr, indices := []string{}, []int{}
-// 	// 			for _, sn := range sSpl(sn, del) {
-// 	// 				strnum := sSpl(sn, "#")
-// 	// 				sArr = append(sArr, strnum[0])
-// 	// 				indices = append(indices, Str(strnum[1]).ToInt())
-// 	// 			}
-// 	// 			path := sJ(sArr, del) + del + s3
-// 	// 			indices = append(indices, 0)
-// 	// 			if _, _, _, n := s.JSONXPathValue(path, del, indices...); n >= 0 { // ** get this level's count
-// 	// 				(*mapAC)[sn+del+s3] = struct {
-// 	// 					Count int
-// 	// 					ID    string
-// 	// 				}{Count: n, ID: id}
-// 	// 			}
-// 	// 		}
-// 	// 	}
-// 	// }
-
-// 	// ****************************************************************************************
-
-// 	//for k := range mapA {
-// 	//ss := sSpl(k, del)
-// 	//lss := len(ss)
-
-// 	// n := -1
-// 	// if lss == 1 {
-
-// 	// 	indices := []int{0}
-// 	// 	_, _, _, n = s.JSONXPathValue(k, del, indices...)
-// 	// 	(*mapAC)[k] = struct {
-// 	// 		Count int
-// 	// 		ID    string
-// 	// 	}{Count: n, ID: id}
-
-// 	// } else if lss == 2 {
-
-// 	// 	s1, s2, s12, s12ns := ss[0], ss[1], sJ(ss, del), []string{}
-// 	// 	_, _, _, n = s.JSONXPathValue(s1, del, []int{0}...)
-// 	// 	for i := 1; i <= n; i++ {
-// 	// 		s12ns = append(s12ns, fSf("%s#%d%s%s", s1, i, del, s2))
-// 	// 	}
-// 	// 	for i, ns := range s12ns {
-// 	// 		idx := Str(sSpl(sSpl(ns, del)[0], "#")[1]).ToInt()
-// 	// 		_, _, _, n = s.JSONXPathValue(s12, del, []int{idx, 0}...)
-// 	// 		(*mapAC)[s12ns[i]] = struct {
-// 	// 			Count int
-// 	// 			ID    string
-// 	// 		}{Count: n, ID: id}
-// 	// 	}
-
-// 	// } else if lss == 3 {
-
-// 	// }
-
-// 	/******************************************/
-
-// 	// if lss < 3 {
-
-// 	// 	indices := TerOp(len(ss) == 1, []int{0}, []int{1, 0}).([]int)
-// 	// 	_, _, _, n := s.JSONXPathValue(k, del, indices...)
-// 	// 	(*mapAC)[k] = struct {
-// 	// 		Count int
-// 	// 		ID    string
-// 	// 	}{Count: n, ID: id}
-
-// 	// } else if lss == 3 {
-
-// 	// 	s12, s3, s123, s123ns := sJ(ss[:2], del), ss[2], sJ(ss, del), []string{}
-// 	// 	_, _, _, n := s.JSONXPathValue(s12, del, []int{1, 0}...)
-// 	// 	for i := 1; i <= n; i++ {
-// 	// 		s123ns = append(s123ns, fSf("%s#%d%s%s", s12, i, del, s3))
-// 	// 	}
-// 	// 	// fPln(s123ns)
-
-// 	// 	for i, ns := range s123ns {
-// 	// 		idx := Str(sSpl(sSpl(ns, del)[1], "#")[1]).ToInt()
-// 	// 		_, _, _, n = s.JSONXPathValue(s123, del, []int{1, idx, 0}...)
-// 	// 		(*mapAC)[s123ns[i]] = struct {
-// 	// 			Count int
-// 	// 			ID    string
-// 	// 		}{Count: n, ID: id}
-// 	// 	}
-
-// 	// } else if lss == 4 {
-
-// 	// 	// s123, s4, s1234, s1234ns := sJ(ss[:3], del), ss[3], sJ(ss, del), []string{}
-// 	// 	// _, _, _, n := s.JSONXPathValue(s12, del, []int{1, 0}...)
-
-// 	// } else {
-
-// 	// 	panic("haven't implemented this level nested array function")
-
-// 	// }
-// 	//}
-
-// 	return mapFT, mapAC
-// }
 
 // JSONObjectMerge :
 func JSONObjectMerge(s Str, json string) (rst string) {
@@ -575,8 +354,57 @@ func JSONObjectMerge(s Str, json string) (rst string) {
 	return
 }
 
-// JSONBuild : NOT support mixed (atomic & object) types in one array                                              &
-// func (s Str) JSONBuild(xpath, del, property, value string, indices ...int) (string, bool) {
+// JSONBuild : NOT support mixed (atomic & object) types in one array
+func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, bool) {
+
+	property = Str(property).MkQuotes(QDouble).V() + ": "
+
+	switch value.(type) {
+	case string:
+		if !IArrEleIn(Str(value.(string)).C(0), C32s{'{', '['}) {
+			value = Str(value.(string)).MkQuotes(QDouble).V()
+		}
+	}
+
+	s = IF(s.T(BLANK) == "", Str("{}"), s).(Str)
+	if s == "{}" { //                                                           *** first element ***
+		s = Str(fSf(`{ %s%s}`, property, value))
+		return s.V(), IsJSON(s)
+	}
+	if Str(iPath).T(BLANK) == "" {
+		content, start, end := s.BracketsPos(BCurly, 1, 1)
+
+		if content.Idx(property) == 
+
+		s = s.S(start, end) + Str(fSf(`, %s%v}`, property, value))
+		return s.V(), IsJSON(s)
+	}
+
+
+
+	// path, indices := IPathToPathIndices(iPath, del)
+
+	// BLevel := len(indices) + 1
+
+	// content, _ := JSONXPathValue(s, path, del, indices...)
+	// switch {
+	// case content == "{}":
+
+	// 	_, left, right := s.BracketsPos(BCurly, BLevel, 1)
+
+	// 	content = fSf("{ %s%s }", property, value)
+	// 	s = s.SegRep(left, right+1, content)
+
+	// case Str(content).HP("{") && Str(content).HS("}"):
+
+	// }
+
+	return s.V(), IsJSON(s)
+
+}
+
+// // JSONBuild : NOT support mixed (atomic & object) types in one array                                              &
+// func JSONBuild(s Str, xpath, del, property, value string, indices ...int) (string, bool) {
 // 	if s.T(BLANK) == "" {
 // 		s = Str("{}")
 // 	}
@@ -591,10 +419,10 @@ func JSONObjectMerge(s Str, json string) (rst string) {
 
 // 	if s == "{}" {
 // 		s = Str(fSf(`{ %s%s}`, property, value))
-// 		return s.V(), s.IsJSON()
+// 		return s.V(), IsJSON(s)
 // 	}
 
-// 	if sub, start, end, _ := s.JSONXPathValue(xpath, del, indices...); start != -1 {
+// 	if sub, start, end, _ := JSONXPathValue(s, xpath, del, indices...); start != -1 {
 
 // 		for _, p0 := range Str(sub).Indices(property) { //                               ** incoming p-v's property already exists **
 // 			sub02p0 := Str(sub).S(0, p0).V()

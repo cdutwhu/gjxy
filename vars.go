@@ -12,6 +12,7 @@ import (
 type (
 	Str  = w.Str
 	Strs = w.Strs
+	C32s = w.C32s
 )
 
 const (
@@ -26,16 +27,19 @@ var (
 	IF = u.IF
 	PC = u.PanicOnCondition
 
-	GetMapKeys = w.GetMapKeys
+	GetMapKeys    = w.GetMapKeys
+	IArrSearchOne = w.IArrSearchOne
+	IArrEleIn     = w.IArrEleIn
 
 	sortByLess = sort.Sort
 
 	fEf  = fmt.Errorf
 	fSf  = fmt.Sprintf
 	fPln = fmt.Println
+	fPf  = fmt.Printf
 
 	sCtn = strings.Contains
 	sCnt = strings.Count
 	sSpl = strings.Split
-	sJ   = strings.Join	
+	sJ   = strings.Join
 )

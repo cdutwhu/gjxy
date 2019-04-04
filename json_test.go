@@ -21,7 +21,16 @@ func TestJSONChild(t *testing.T) {
 
 		fPln(" ----------------------------------------------- ")
 
-		JSONArrInfo(s, "xapi", " ~ ", "id", nil)
+		mapFT, mapArrInfo := JSONArrInfo(s, "xapi", " ~ ", "id", nil)
+		for k, v := range *mapFT {
+			fPln(k, v)
+		}
+
+		fPln(" ----------------------------------------------- ")
+
+		for k, v := range *mapArrInfo {
+			fPln(k, v)
+		}
 	}
 
 	// jsonSample := Str(` [ 1, "a", 123, ["ab"], true, false, true, null, null ] `)
@@ -118,11 +127,22 @@ func TestJSONArrInfo(t *testing.T) {
 }
 
 func TestJSONMake(t *testing.T) {
-	// json, ok := Str("").JSONBuild("", ".", "StaffPersonal", "{}", 1)
+	json, ok := JSONBuild(Str(""), "", ".", "StaffPersonal", "{}")
+	fPln(json, ok)
+
+	json, ok = JSONBuild(Str(json), "", ".", "Number", "abc")
+	fPln(json, ok)
+
+	json, ok = JSONBuild(Str(json), "", ".", "Number1", 123)
+	fPln(json, ok)
+
+	json, ok = JSONBuild(Str(json), "", ".", "Number1", 456)
+	fPln(json, ok)
+
 	// // //json, ok = Str(json).JSONBuild("StaffPersonal", ".", 1, "-RefId", "{}")
-	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "LocalId", "946379881", 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "LocalId", "946379882", 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "LocalIdTest", "tttttttt", 1)
+	// json, ok = JSONBuild(Str(json), "StaffPersonal#1", ".", "LocalId", "946379881")
+	// json, ok = JSONBuild(Str(json), "StaffPersonal#1", ".", "LocalId", "946379882")
+	// json, ok = JSONBuild(Str(json), "StaffPersonal#1", ".", "LocalIdTest", "tttttttt")
 	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "StateProvinceId", "C2345681", 1)
 	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "OtherIdList", "{}", 1)            //                                ***
 	// json, ok = Str(json).JSONBuild("StaffPersonal.OtherIdList", ".", "OtherId", "{}", 1, 1) //                     *** 1
