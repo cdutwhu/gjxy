@@ -356,7 +356,8 @@ func JSONObjectMerge(s Str, json string) (rst string) {
 }
 
 // JSONBuildObj :
-func JSONBuildObj(s Str, obj, property string, value interface{}) (string, bool) {
+func JSONBuildObj(s Str, obj, property string, value interface{}, overwrite bool) (string, bool) {
+	defer func() { mapJBPos[obj] = s.L() - 1 }()
 
 	property = Str(property).MkQuotes(QDouble).V()
 
@@ -370,42 +371,55 @@ func JSONBuildObj(s Str, obj, property string, value interface{}) (string, bool)
 	s = IF(s.T(BLANK) == "", Str("{}"), s).(Str)
 	if s == "{}" { //                                                         *** first element ***
 		s = Str(fSf(`{%s: %s}`, property, value))
-		mapJBPos[obj] = s.L() - 1
 		mapJBKids[obj] = append(mapJBKids[obj], property)
 		return s.V(), IsJSON(s)
 	}
 
 	if start, ok := mapJBPos[obj]; ok { //                                    *** existing iPath to add ***
-		if IArrEleIn(property, Strs(mapJBKids[obj])) { //                     *** same property, to merge ***
-			// fPln(property, "did before, merge into array")
 
-			content, oriVL := "", 0
+		if IArrEleIn(property, Strs(mapJBKids[obj])) { //                     *** same property, to merge / overwrite ***
+			// fPln(property, "did before, merge / overwrite into array")
+
 			for _, find := range s.Indices(property) {
-				if s.BracketDepth(BCurly, find) == 1 { //                     *** correct insert position ***
-					start = find + Str(property).L() + 2 //                   *** move to behind ": ", so plus 2 ***
-					content, _ = JSONChildValue(s, property)
-					oriVL = Str(content).L()
+				if s.BracketDepth(BCurly, find) == 1 { //                 *** correct insert position ***
+					start = find + Str(property).L() + 2 //               *** move to behind ": ", so plus 2 ***
+					content, _ := JSONChildValue(s, property)
 					// fPln(content)
-					content = Str(content).RmBrackets(BBox).V()
-					content = fSf(`[%s, %v]`, content, value)
-					break
+
+					if !overwrite { //                                    *** merge into array ***
+						oriVL := Str(content).L()
+						content = Str(content).RmBrackets(BBox).V()
+						content = fSf(`[%s, %v]`, content, value)
+						s = s.SegRep(start, start+oriVL, content)
+						return s.V(), IsJSON(s)
+					}
+
+					//                                                    *** overwrite existing content ***
+					proval := property + ": " + content
+					s = Str(sRep(s.V(), proval, fSf("%s: %v", property, value), 1))
+					return s.V(), IsJSON(s)
 				}
 			}
-
-			s = s.SegRep(start, start+oriVL, content)
-			mapJBPos[obj] = s.L() - 1
-			return s.V(), IsJSON(s)
 		}
 
-		//                                                                      *** new property ***
+		//                                                                    *** new property ***
 		seg := fSf(`, %s: %v}`, property, value)
 		s = s.SegRep(start, start+1, seg)
-		mapJBPos[obj] = s.L() - 1
 		mapJBKids[obj] = append(mapJBKids[obj], property)
 		return s.V(), IsJSON(s)
 	}
 
 	return s.V(), IsJSON(s)
+}
+
+// JSONBuild :
+func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, bool) {
+	path, indices := IPathToPathIndices(iPath, del)
+	ss := sSpl(path, del)
+	obj := ss[len(ss)-1]
+	content, _ := JSONXPathValue(s, path, del, indices...)
+	objstr, ok := JSONBuildObj(Str(content), obj, property, value, false)
+	return objstr, ok
 }
 
 // // JSONBuild : NOT support mixed (atomic & object) types in one array

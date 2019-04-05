@@ -128,41 +128,25 @@ func TestJSONArrInfo(t *testing.T) {
 
 func TestJSONMake(t *testing.T) {
 
-	StaffPersonal, ok1 := JSONBuildObj(Str(""), "StaffPersonal", "name", "hello")
+	StaffPersonal, ok1 := JSONBuildObj(Str(""), "StaffPersonal", "name", "hello", false)
 	fPln("11", StaffPersonal, ok1)
 
-	StaffPersonal, ok1 = JSONBuildObj(Str(StaffPersonal), "StaffPersonal", "name1", "staff")
+	StaffPersonal, ok1 = JSONBuildObj(Str(StaffPersonal), "StaffPersonal", "name1", "staff", false)
 	fPln("12", StaffPersonal, ok1)
 
-	root, ok := JSONBuildObj(Str(""), "root", "StaffPersonal", StaffPersonal)
+	StaffPersonal, ok1 = JSONBuildObj(Str(StaffPersonal), "StaffPersonal", "age", 11, false)
+	fPln("13", StaffPersonal, ok1)
+
+	root, ok := JSONBuildObj(Str(""), "root", "StaffPersonal", "{}", false)
 	fPln("1", root, ok)
 
-	root, ok = JSONBuildObj(Str(root), "root", "Number", "abc")
-	fPln("2", root, ok)
+	root, ok = JSONBuildObj(Str(root), "root", "StaffPersonal", StaffPersonal, true)
+	fPln("1", root, ok)
 
-	root, ok = JSONBuildObj(Str(root), "root", "Number1", 12)
-	fPln("3", root, ok)
+	
 
-	root, ok = JSONBuildObj(Str(root), "root", "Number", "def")
-	fPln("4", root, ok)
-
-	root, ok = JSONBuildObj(Str(root), "root", "Number1", 45)
-	fPln("5", root, ok)
-
-	root, ok = JSONBuildObj(Str(root), "root", "Number2", 7888)
-	fPln("6", root, ok)
-
-	root, ok = JSONBuildObj(Str(root), "root", "Number1", 78)
-	fPln("7", root, ok)
-
-	// root, ok = JSONBuildObj(Str(root), "root", "StaffPersonal", "{}")
-	// fPln("8", root, ok)
-
-	root, ok = JSONBuildObj(Str(root), "root", "Number3", 9999)
-	fPln("9", root, ok)
-
-	root, ok = JSONBuildObj(Str(root), "root", "Number2", 9999)
-	fPln("10", root, ok)
+	// root, ok = JSONBuildObj(Str(root), "root", "StaffPersonal", StaffPersonal, false)
+	// fPln("101", root, ok)
 
 	// jsonMap := make(map[string]interface{})
 	// json.Unmarshal([]byte(root), &jsonMap)

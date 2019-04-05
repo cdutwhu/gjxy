@@ -42,4 +42,5 @@ var (
 	sCnt = strings.Count
 	sSpl = strings.Split
 	sJ   = strings.Join
+	sRep = strings.Replace
 )
