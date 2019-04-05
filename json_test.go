@@ -127,29 +127,45 @@ func TestJSONArrInfo(t *testing.T) {
 }
 
 func TestJSONMake(t *testing.T) {
-	jsonstr, ok := JSONBuild(Str(""), "", ".", "StaffPersonal", "{}")
-	fPln(jsonstr, ok)
 
-	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number", "abc")
-	fPln(jsonstr, ok)
+	StaffPersonal, ok1 := JSONBuildObj(Str(""), "StaffPersonal", "name", "hello")
+	fPln("11", StaffPersonal, ok1)
 
-	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number1", 123)
-	fPln(jsonstr, ok)
+	StaffPersonal, ok1 = JSONBuildObj(Str(StaffPersonal), "StaffPersonal", "name1", "staff")
+	fPln("12", StaffPersonal, ok1)
 
-	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number1", 456)
-	fPln(jsonstr, ok)
+	root, ok := JSONBuildObj(Str(""), "root", "StaffPersonal", StaffPersonal)
+	fPln("1", root, ok)
 
-	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number1", 789)
-	fPln(jsonstr, ok)
+	root, ok = JSONBuildObj(Str(root), "root", "Number", "abc")
+	fPln("2", root, ok)
 
-	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number", "def")
-	fPln(jsonstr, ok)
+	root, ok = JSONBuildObj(Str(root), "root", "Number1", 12)
+	fPln("3", root, ok)
 
-	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "StaffPersonal", "{}")
-	fPln(jsonstr, ok)
+	root, ok = JSONBuildObj(Str(root), "root", "Number", "def")
+	fPln("4", root, ok)
+
+	root, ok = JSONBuildObj(Str(root), "root", "Number1", 45)
+	fPln("5", root, ok)
+
+	root, ok = JSONBuildObj(Str(root), "root", "Number2", 7888)
+	fPln("6", root, ok)
+
+	root, ok = JSONBuildObj(Str(root), "root", "Number1", 78)
+	fPln("7", root, ok)
+
+	// root, ok = JSONBuildObj(Str(root), "root", "StaffPersonal", "{}")
+	// fPln("8", root, ok)
+
+	root, ok = JSONBuildObj(Str(root), "root", "Number3", 9999)
+	fPln("9", root, ok)
+
+	root, ok = JSONBuildObj(Str(root), "root", "Number2", 9999)
+	fPln("10", root, ok)
 
 	// jsonMap := make(map[string]interface{})
-	// json.Unmarshal([]byte(jsonstr), &jsonMap)
+	// json.Unmarshal([]byte(root), &jsonMap)
 	// for key, value := range jsonMap {
 	// 	fmt.Println("index : ", key, " value : ", value)
 	// }
@@ -187,7 +203,7 @@ func TestJSONMake(t *testing.T) {
 	// // // // fPln(Str(json).JSONXPath("StaffPersonal.PersonInfo.OtherNames.Name", ".", 1))
 
 	// fPln(json, ok)
-	// ioutil.WriteFile("temp.json", []byte(json), 0666)
+	ioutil.WriteFile("temp.json", []byte(root), 0666)
 }
 
 func TestJSONObjectMerge(t *testing.T) {

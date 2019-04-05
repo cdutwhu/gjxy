@@ -355,8 +355,8 @@ func JSONObjectMerge(s Str, json string) (rst string) {
 	return
 }
 
-// JSONBuild : NOT support mixed (atomic & object) types in one array
-func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, bool) {
+// JSONBuildObj :
+func JSONBuildObj(s Str, obj, property string, value interface{}) (string, bool) {
 
 	property = Str(property).MkQuotes(QDouble).V()
 
@@ -368,30 +368,24 @@ func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, b
 	}
 
 	s = IF(s.T(BLANK) == "", Str("{}"), s).(Str)
-	if s == "{}" { //                                                           *** first element ***
+	if s == "{}" { //                                                         *** first element ***
 		s = Str(fSf(`{%s: %s}`, property, value))
-		mapJBPos[""] = s.L() - 1
-		mapJBKids[""] = append(mapJBKids[""], property)
+		mapJBPos[obj] = s.L() - 1
+		mapJBKids[obj] = append(mapJBKids[obj], property)
 		return s.V(), IsJSON(s)
 	}
 
-	if start, ok := mapJBPos[iPath]; ok { //                                    *** existing iPath to add ***
-
-		if IArrEleIn(property, Strs(mapJBKids[iPath])) { //                     *** same property, to merge ***
-			fPln(property, "did before, merge into array")
+	if start, ok := mapJBPos[obj]; ok { //                                    *** existing iPath to add ***
+		if IArrEleIn(property, Strs(mapJBKids[obj])) { //                     *** same property, to merge ***
+			// fPln(property, "did before, merge into array")
 
 			content, oriVL := "", 0
 			for _, find := range s.Indices(property) {
-				if s.BracketDepth(BCurly, find) == 1 { //                       *** correct insert position ***
-					start = find + Str(property).L() + 2 //                     *** move to behind ": ", so plus 2 ***
-
-					iPathNext := IF(iPath == "", property+"#0", iPath+del+property+"#0").(string)
-					path, indices := IPathToPathIndices(iPathNext, del)
-					content, _ = JSONXPathValue(s, path, del, indices...)
-
+				if s.BracketDepth(BCurly, find) == 1 { //                     *** correct insert position ***
+					start = find + Str(property).L() + 2 //                   *** move to behind ": ", so plus 2 ***
+					content, _ = JSONChildValue(s, property)
 					oriVL = Str(content).L()
-					fPln(content)
-
+					// fPln(content)
 					content = Str(content).RmBrackets(BBox).V()
 					content = fSf(`[%s, %v]`, content, value)
 					break
@@ -399,20 +393,83 @@ func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, b
 			}
 
 			s = s.SegRep(start, start+oriVL, content)
-			mapJBPos[iPath] = s.L() - 1
+			mapJBPos[obj] = s.L() - 1
 			return s.V(), IsJSON(s)
 		}
 
 		//                                                                      *** new property ***
 		seg := fSf(`, %s: %v}`, property, value)
 		s = s.SegRep(start, start+1, seg)
-		mapJBPos[iPath] = s.L() - 1
-		mapJBKids[iPath] = append(mapJBKids[iPath], property)
+		mapJBPos[obj] = s.L() - 1
+		mapJBKids[obj] = append(mapJBKids[obj], property)
 		return s.V(), IsJSON(s)
 	}
 
 	return s.V(), IsJSON(s)
 }
+
+// // JSONBuild : NOT support mixed (atomic & object) types in one array
+// func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, bool) {
+
+// 	property = Str(property).MkQuotes(QDouble).V()
+
+// 	switch value.(type) {
+// 	case string:
+// 		if !IArrEleIn(Str(value.(string)).C(0), C32s{'{', '['}) {
+// 			value = Str(value.(string)).MkQuotes(QDouble).V()
+// 		}
+// 	}
+
+// 	s = IF(s.T(BLANK) == "", Str("{}"), s).(Str)
+// 	if s == "{}" { //                                                           *** first element ***
+// 		s = Str(fSf(`{%s: %s}`, property, value))
+// 		mapJBPos[""] = s.L() - 1
+// 		mapJBKids[""] = append(mapJBKids[""], property)
+// 		return s.V(), IsJSON(s)
+// 	}
+
+// 	if start, ok := mapJBPos[iPath]; ok { //                                    *** existing iPath to add ***
+// 		if IArrEleIn(property, Strs(mapJBKids[iPath])) { //                     *** same property, to merge ***
+// 			// fPln(property, "did before, merge into array")
+
+// 			content, oriVL := "", 0
+// 			for _, find := range s.Indices(property) {
+// 				if s.BracketDepth(BCurly, find) == 1 { //                       *** correct insert position ***
+// 					start = find + Str(property).L() + 2 //                     *** move to behind ": ", so plus 2 ***
+
+// 					iPathNext := IF(iPath == "", property+"#0", iPath+del+property+"#0").(string)
+// 					path, indices := IPathToPathIndices(iPathNext, del)
+// 					content, _ = JSONXPathValue(s, path, del, indices...)
+
+// 					oriVL = Str(content).L()
+// 					// fPln(content)
+
+// 					content = Str(content).RmBrackets(BBox).V()
+// 					content = fSf(`[%s, %v]`, content, value)
+// 					break
+// 				}
+// 			}
+
+// 			s = s.SegRep(start, start+oriVL, content)
+// 			mapJBPos[iPath] = s.L() - 1
+// 			return s.V(), IsJSON(s)
+// 		}
+
+// 		//                                                                      *** new property ***
+// 		seg := fSf(`, %s: %v}`, property, value)
+// 		s = s.SegRep(start, start+1, seg)
+// 		mapJBPos[iPath] = s.L() - 1
+// 		mapJBKids[iPath] = append(mapJBKids[iPath], property)
+// 		return s.V(), IsJSON(s)
+// 	}
+
+// 	// path, indices := IPathToPathIndices(iPath, del)
+// 	// JSONXPathValue(s, path, del, indices...)
+
+// 	return s.V(), IsJSON(s)
+// }
+
+// **********************************************************
 
 // // JSONBuild : NOT support mixed (atomic & object) types in one array                                              &
 // func JSONBuild(s Str, xpath, del, property, value string, indices ...int) (string, bool) {

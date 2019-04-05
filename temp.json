@@ -1,0 +1,20 @@
+{
+    "StaffPersonal": {
+        "name": "hello",
+        "name1": "staff"
+    },
+    "Number": [
+        "abc",
+        "def"
+    ],
+    "Number1": [
+        12,
+        45,
+        78
+    ],
+    "Number2": [
+        7888,
+        9999
+    ],
+    "Number3": 9999
+}
