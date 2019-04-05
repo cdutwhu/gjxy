@@ -15,6 +15,8 @@ var (
 		JT_MIX:  "Mix",
 		JT_UNK:  "Unknown",
 	}
+	mapJBPos  = make(map[string]int)
+	mapJBKids = make(map[string][]string)
 )
 
 const (

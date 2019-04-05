@@ -98,7 +98,7 @@ func JSONWrapRoot(s Str, rootExt string) (root string, ext bool, extJSON string)
 	return
 }
 
-// JSONChildValue : only return the value content                                               ?
+// JSONChildValue :                                                                                   ?
 func JSONChildValue(s Str, child string) (content string, cType JSONTYPE) {
 	PC(!IsJSON(s), fEf("Invalid JSON"))
 	child = Str(child).MkQuotes(QDouble).V()
@@ -123,7 +123,8 @@ AGAIN:
 			} else if ok, s, _ := sBelow.SearchStrsIgnore(":", "\"", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** string ***
 
 				str, _, _ := sBelow.QuotesPos(QDouble, 2)
-				content, cType = str.RmQuotes(QDouble).V(), JT_STR
+				//content, cType = str.RmQuotes(QDouble).V(), JT_STR
+				content, cType = str.V(), JT_STR //                      ** keep string value's quotations **
 
 			} else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, DigStrArr, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** number ***
 
@@ -357,7 +358,7 @@ func JSONObjectMerge(s Str, json string) (rst string) {
 // JSONBuild : NOT support mixed (atomic & object) types in one array
 func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, bool) {
 
-	property = Str(property).MkQuotes(QDouble).V() + ": "
+	property = Str(property).MkQuotes(QDouble).V()
 
 	switch value.(type) {
 	case string:
@@ -368,39 +369,49 @@ func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, b
 
 	s = IF(s.T(BLANK) == "", Str("{}"), s).(Str)
 	if s == "{}" { //                                                           *** first element ***
-		s = Str(fSf(`{ %s%s}`, property, value))
-		return s.V(), IsJSON(s)
-	}
-	if Str(iPath).T(BLANK) == "" {
-		content, start, end := s.BracketsPos(BCurly, 1, 1)
-
-		if content.Idx(property) == 
-
-		s = s.S(start, end) + Str(fSf(`, %s%v}`, property, value))
+		s = Str(fSf(`{%s: %s}`, property, value))
+		mapJBPos[""] = s.L() - 1
+		mapJBKids[""] = append(mapJBKids[""], property)
 		return s.V(), IsJSON(s)
 	}
 
+	if start, ok := mapJBPos[iPath]; ok { //                                    *** existing iPath to add ***
 
+		if IArrEleIn(property, Strs(mapJBKids[iPath])) { //                     *** same property, to merge ***
+			fPln(property, "did before, merge into array")
 
-	// path, indices := IPathToPathIndices(iPath, del)
+			content, oriVL := "", 0
+			for _, find := range s.Indices(property) {
+				if s.BracketDepth(BCurly, find) == 1 { //                       *** correct insert position ***
+					start = find + Str(property).L() + 2 //                     *** move to behind ": ", so plus 2 ***
 
-	// BLevel := len(indices) + 1
+					iPathNext := IF(iPath == "", property+"#0", iPath+del+property+"#0").(string)
+					path, indices := IPathToPathIndices(iPathNext, del)
+					content, _ = JSONXPathValue(s, path, del, indices...)
 
-	// content, _ := JSONXPathValue(s, path, del, indices...)
-	// switch {
-	// case content == "{}":
+					oriVL = Str(content).L()
+					fPln(content)
 
-	// 	_, left, right := s.BracketsPos(BCurly, BLevel, 1)
+					content = Str(content).RmBrackets(BBox).V()
+					content = fSf(`[%s, %v]`, content, value)
+					break
+				}
+			}
 
-	// 	content = fSf("{ %s%s }", property, value)
-	// 	s = s.SegRep(left, right+1, content)
+			s = s.SegRep(start, start+oriVL, content)
+			mapJBPos[iPath] = s.L() - 1
+			return s.V(), IsJSON(s)
+		}
 
-	// case Str(content).HP("{") && Str(content).HS("}"):
-
-	// }
+		//                                                                      *** new property ***
+		seg := fSf(`, %s: %v}`, property, value)
+		s = s.SegRep(start, start+1, seg)
+		mapJBPos[iPath] = s.L() - 1
+		mapJBKids[iPath] = append(mapJBKids[iPath], property)
+		return s.V(), IsJSON(s)
+	}
 
 	return s.V(), IsJSON(s)
-
 }
 
 // // JSONBuild : NOT support mixed (atomic & object) types in one array                                              &

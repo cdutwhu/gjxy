@@ -127,17 +127,32 @@ func TestJSONArrInfo(t *testing.T) {
 }
 
 func TestJSONMake(t *testing.T) {
-	json, ok := JSONBuild(Str(""), "", ".", "StaffPersonal", "{}")
-	fPln(json, ok)
+	jsonstr, ok := JSONBuild(Str(""), "", ".", "StaffPersonal", "{}")
+	fPln(jsonstr, ok)
 
-	json, ok = JSONBuild(Str(json), "", ".", "Number", "abc")
-	fPln(json, ok)
+	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number", "abc")
+	fPln(jsonstr, ok)
 
-	json, ok = JSONBuild(Str(json), "", ".", "Number1", 123)
-	fPln(json, ok)
+	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number1", 123)
+	fPln(jsonstr, ok)
 
-	json, ok = JSONBuild(Str(json), "", ".", "Number1", 456)
-	fPln(json, ok)
+	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number1", 456)
+	fPln(jsonstr, ok)
+
+	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number1", 789)
+	fPln(jsonstr, ok)
+
+	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "Number", "def")
+	fPln(jsonstr, ok)
+
+	jsonstr, ok = JSONBuild(Str(jsonstr), "", ".", "StaffPersonal", "{}")
+	fPln(jsonstr, ok)
+
+	// jsonMap := make(map[string]interface{})
+	// json.Unmarshal([]byte(jsonstr), &jsonMap)
+	// for key, value := range jsonMap {
+	// 	fmt.Println("index : ", key, " value : ", value)
+	// }
 
 	// // //json, ok = Str(json).JSONBuild("StaffPersonal", ".", 1, "-RefId", "{}")
 	// json, ok = JSONBuild(Str(json), "StaffPersonal#1", ".", "LocalId", "946379881")
