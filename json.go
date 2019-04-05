@@ -3,15 +3,15 @@ package gjxy
 import "encoding/json"
 
 // IsJSON :                                                                                     &
-func IsJSON(s Str) bool {
+func IsJSON(s string) bool {
 	var js json.RawMessage
-	return json.Unmarshal([]byte(s.V()), &js) == nil
+	return json.Unmarshal([]byte(s), &js) == nil
 }
 
 // JSONFstEle : The first json child                                                            &
-func JSONFstEle(s Str) string {
+func JSONFstEle(s string) string {
 	PC(!IsJSON(s), fEf("Invalid JSON"))
-	str := s.T(BLANK).RmBrackets(BCurly).T(BLANK)
+	str := Str(s).T(BLANK).RmBrackets(BCurly).T(BLANK)
 	if p := str.Idx(":"); p > 0 {
 		str = str.S(0, p)
 		str = str.T(BLANK)
@@ -20,27 +20,27 @@ func JSONFstEle(s Str) string {
 }
 
 // IsJSONSingle :
-func IsJSONSingle(s Str) (ok bool, tag string) {
+func IsJSONSingle(s string) (ok bool, tag string) {
 	PC(!IsJSON(s), fEf("Invalid JSON"))
-	s = s.T(BLANK)
-	if s.C(0) == '{' && s.C(LAST) == '}' {
-		s = s.S(1, ALL-1).T(BLANK)
-		if s.QuotePairCount(QDouble) == 1 {
-			ok, tag = true, s.S(0, s.Idx(":")).RmQuotes(QDouble).V()
+	S := Str(s).T(BLANK)
+	if S.C(0) == '{' && S.C(LAST) == '}' {
+		S = S.S(1, ALL-1).T(BLANK)
+		if S.QuotePairCount(QDouble) == 1 {
+			ok, tag = true, S.S(0, S.Idx(":")).RmQuotes(QDouble).V()
 		}
 	}
 	return
 }
 
 // IsJSONArray : Array Info be valid only on single-type elements.
-func IsJSONArray(s Str) (ok bool, eleType JSONTYPE, n int, eles []string) {
+func IsJSONArray(s string) (ok bool, eleType JSONTYPE, n int, eles []string) {
 	PC(!IsJSON(s), fEf("Invalid JSON"))
-	s = s.T(BLANK)
-	if s.C(0) == '[' && s.C(LAST) == ']' {
+	S := Str(s).T(BLANK)
+	if S.C(0) == '[' && S.C(LAST) == ']' {
 
 		ok = true
 
-		inBox := s.RmBrackets(BBox).T(BLANK)
+		inBox := S.RmBrackets(BBox).T(BLANK)
 		if inBox == "" {
 			eleType, n, eles = JT_UNK, 0, []string{}
 			return
@@ -89,26 +89,26 @@ func IsJSONArray(s Str) (ok bool, eleType JSONTYPE, n int, eles []string) {
 }
 
 // JSONWrapRoot : if Not Single JSON, add Single "root", return the modified JSON.              &
-func JSONWrapRoot(s Str, rootExt string) (root string, ext bool, extJSON string) {
+func JSONWrapRoot(s, rootExt string) (root string, ext bool, extJSON string) {
 	if ok, tag := IsJSONSingle(s); ok {
-		return tag, false, s.V()
+		return tag, false, s
 	}
-	root, ext, extJSON = rootExt, true, fSf(`{ "%s": %s }`, rootExt, s.V())
-	PC(!IsJSON(Str(extJSON)), fEf("JSONWrapRoot error"))
+	root, ext, extJSON = rootExt, true, fSf(`{ "%s": %s }`, rootExt, s)
+	PC(!IsJSON(extJSON), fEf("JSONWrapRoot error"))
 	return
 }
 
 // JSONChildValue :                                                                                   ?
-func JSONChildValue(s Str, child string) (content string, cType JSONTYPE) {
+func JSONChildValue(s, child string) (content string, cType JSONTYPE) {
 	PC(!IsJSON(s), fEf("Invalid JSON"))
 	child = Str(child).MkQuotes(QDouble).V()
 	Lc := Str(child).L()
 
 AGAIN:
-	L := s.L()
-	if ok, start, _ := s.SearchStrsIgnore(child, ":", BLANK); ok {
-		above := s.S(0, start, L).V()
-		sBelow := s.S(start, ALL, L)
+	L := Str(s).L()
+	if ok, start, _ := Str(s).SearchStrsIgnore(child, ":", BLANK); ok {
+		above := Str(s).S(0, start, L).V()
+		sBelow := Str(s).S(start, ALL, L)
 		if sCnt(above, "{")-sCnt(above, "}") == 1 { // *** TRUELY FOUND ( Object OR Value ) ***
 			if ok, s, _ := sBelow.SearchStrsIgnore(":", "{", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //         *** object ***
 
@@ -137,7 +137,7 @@ AGAIN:
 		}
 
 		// *** FAKE FOUND, Maybe above string's sub-element's same tag ***
-		s = s.SegRep(start, start+2, "\"*")
+		s = Str(s).SegRep(start, start+2, "\"*").V()
 		goto AGAIN
 	}
 	return
@@ -146,10 +146,10 @@ AGAIN:
 // JSONChildValueEx : if this child value is single-type array, e.g. [{},{}], return array count
 // idx is only applicable on array-child. Normally from 1 to get an array-element.
 // If idx is 0, get whole array.
-func JSONChildValueEx(s Str, child string, idx int) (ele string, nArr int) {
+func JSONChildValueEx(s, child string, idx int) (ele string, nArr int) {
 	content, cType := JSONChildValue(s, child)
 	if cType == JT_ARR {
-		_, eType, n, eles := IsJSONArray(Str(content))
+		_, eType, n, eles := IsJSONArray(content)
 		nArr = n
 		if idx == 0 || eType == JT_UNK {
 			ele = content
@@ -164,7 +164,7 @@ func JSONChildValueEx(s Str, child string, idx int) (ele string, nArr int) {
 
 // JSONXPathValue : cannot use empty path to get current. indices is from the 1st path-seg's array index.    &
 // if it's not array, use 1; if it is 0 and array, return the whole array
-func JSONXPathValue(s Str, xpath, del string, indices ...int) (content string, nArr int) {
+func JSONXPathValue(s, xpath, del string, indices ...int) (content string, nArr int) {
 	PC(xpath == "", fEf("at least one path must be provided"))
 
 	segs := sSpl(xpath, del)
@@ -174,16 +174,16 @@ func JSONXPathValue(s Str, xpath, del string, indices ...int) (content string, n
 	}
 
 	for i, seg := range segs {
-		s = IF(content != "", Str(content), s).(Str)
+		s = IF(content != "", content, s).(string)
 		content, nArr = JSONChildValueEx(s, seg, indices[i])
 	}
 	return
 }
 
 // JSONObjChildren :
-func JSONObjChildren(s Str) (children []string) {
+func JSONObjChildren(s string) (children []string) {
 	PC(!IsJSON(s), fEf("Invalid JSON"))
-	inCurly := s.T(BLANK).RmBrackets(BCurly).T(BLANK)
+	inCurly := Str(s).T(BLANK).RmBrackets(BCurly).T(BLANK)
 
 	posList := []int{}
 	starts, _ := inCurly.Indices2StrsIgnore("\"", ":", BLANK) //         *** slow, flexible ***
@@ -208,11 +208,11 @@ func JSONObjChildren(s Str) (children []string) {
 }
 
 // JSONFamilyTree : Use One Sample to get FamilyTree, DO NOT use long array data                                   &
-func JSONFamilyTree(s Str, fName, del string, mapFT *map[string][]string) {
+func JSONFamilyTree(s, fName, del string, mapFT *map[string][]string) {
 	PC(mapFT == nil, fEf("FamilyTree return map is not initialised !"))
 	// fPln(fName) // DEBUG
 
-	if s.T(BLANK).C(0) != '{' && s.T(BLANK).C(LAST) != '}' {
+	if Str(s).T(BLANK).C(0) != '{' && Str(s).T(BLANK).C(LAST) != '}' {
 		return
 	}
 
@@ -231,8 +231,8 @@ func JSONFamilyTree(s Str, fName, del string, mapFT *map[string][]string) {
 				indices = append(indices, 1)
 			}
 
-			str, _ := JSONXPathValue(s, nextPath, del, indices...)
-			JSONFamilyTree(Str(str), nextPath, del, mapFT)
+			content, _ := JSONXPathValue(s, nextPath, del, indices...)
+			JSONFamilyTree(content, nextPath, del, mapFT)
 		}
 	}
 }
@@ -251,7 +251,7 @@ func IPathToPathIndices(iPath, del string) (string, []int) {
 }
 
 // JSONArrByIPath :
-func JSONArrByIPath(s Str, iPath, del string, mapFT *map[string][]string) (arrNames []string, arrCnts []int, nextIPaths []string) {
+func JSONArrByIPath(s, iPath, del string, mapFT *map[string][]string) (arrNames []string, arrCnts []int, nextIPaths []string) {
 	path, indices := IPathToPathIndices(iPath, del)
 	// fPln("indices:", indices)
 	leaves := (*mapFT)[path]
@@ -278,7 +278,7 @@ func JSONArrByIPath(s Str, iPath, del string, mapFT *map[string][]string) (arrNa
 }
 
 // JSONWholeArrByIPathByR :
-func JSONWholeArrByIPathByR(s Str, iPath, del, id string, mapFT *map[string][]string, mapIPathNID *map[string]struct {
+func JSONWholeArrByIPathByR(s, iPath, del, id string, mapFT *map[string][]string, mapIPathNID *map[string]struct {
 	Count int
 	ID    string
 }) {
@@ -303,7 +303,7 @@ func JSONWholeArrByIPathByR(s Str, iPath, del, id string, mapFT *map[string][]st
 }
 
 // JSONArrInfo :
-func JSONArrInfo(s Str, xpath, del, id string, mapFT *map[string][]string) (*map[string][]string, *map[string]struct {
+func JSONArrInfo(s, xpath, del, id string, mapFT *map[string][]string) (*map[string][]string, *map[string]struct {
 	Count int
 	ID    string
 }) {
@@ -334,30 +334,29 @@ func JSONArrInfo(s Str, xpath, del, id string, mapFT *map[string][]string) (*map
 }
 
 // JSONObjectMerge :
-func JSONObjectMerge(s Str, json string) (rst string) {
-	jsonStr := Str(json)
-	PC((s.V() != "" && !IsJSON(s)) || !IsJSON(jsonStr), fEf("Error: Invalid JSON string"))
+func JSONObjectMerge(s, json string) (rst string) {	
+	PC((s != "" && !IsJSON(s)) || !IsJSON(json), fEf("Error: Invalid JSON string"))
 
-	if s.V() == "" {
+	if s == "" {
 		return json
 	}
 
-	root1, root2 := JSONFstEle(s), JSONFstEle(jsonStr)
+	root1, root2 := JSONFstEle(s), JSONFstEle(json)
 	PC(root1 != root2, fEf("Error: Different JSON object"))
 
 	content1, _ := JSONChildValueEx(s, root1, 0)
-	content2, _ := JSONChildValueEx(jsonStr, root2, 0)
+	content2, _ := JSONChildValueEx(json, root2, 0)
 	content1, content2 = Str(content1).TL("["+BLANK).V(), Str(content2).TL("["+BLANK).V()
 	content1, content2 = Str(content1).TR("]"+BLANK).V(), Str(content2).TR("]"+BLANK).V()
 
 	rst = fSf(`{ "%s": [ %s, %s ] }`, root1, content1, content2)
-	PC(!IsJSON(Str(rst)), fEf("Error: Json Merge Result"))
+	PC(!IsJSON(rst), fEf("Error: Json Merge Result"))
 	return
 }
 
 // JSONBuildObj :
-func JSONBuildObj(s Str, obj, property string, value interface{}, overwrite bool) (string, bool) {
-	defer func() { mapJBPos[obj] = s.L() - 1 }()
+func JSONBuildObj(s, obj, property string, value interface{}, overwrite bool) (string, bool) {
+	defer func() { mapJBPos[obj] = Str(s).L() - 1 }()
 
 	property = Str(property).MkQuotes(QDouble).V()
 
@@ -368,11 +367,11 @@ func JSONBuildObj(s Str, obj, property string, value interface{}, overwrite bool
 		}
 	}
 
-	s = IF(s.T(BLANK) == "", Str("{}"), s).(Str)
+	s = IF(Str(s).T(BLANK) == "", "{}", s).(string)
 	if s == "{}" { //                                                         *** first element ***
-		s = Str(fSf(`{%s: %s}`, property, value))
+		s = fSf(`{%s: %s}`, property, value)
 		mapJBKids[obj] = append(mapJBKids[obj], property)
-		return s.V(), IsJSON(s)
+		return s, IsJSON(s)
 	}
 
 	if start, ok := mapJBPos[obj]; ok { //                                    *** existing iPath to add ***
@@ -380,8 +379,8 @@ func JSONBuildObj(s Str, obj, property string, value interface{}, overwrite bool
 		if IArrEleIn(property, Strs(mapJBKids[obj])) { //                     *** same property, to merge / overwrite ***
 			// fPln(property, "did before, merge / overwrite into array")
 
-			for _, find := range s.Indices(property) {
-				if s.BracketDepth(BCurly, find) == 1 { //                 *** correct insert position ***
+			for _, find := range Str(s).Indices(property) {
+				if Str(s).BracketDepth(BCurly, find) == 1 { //                 *** correct insert position ***
 					start = find + Str(property).L() + 2 //               *** move to behind ": ", so plus 2 ***
 					content, _ := JSONChildValue(s, property)
 					// fPln(content)
@@ -390,35 +389,35 @@ func JSONBuildObj(s Str, obj, property string, value interface{}, overwrite bool
 						oriVL := Str(content).L()
 						content = Str(content).RmBrackets(BBox).V()
 						content = fSf(`[%s, %v]`, content, value)
-						s = s.SegRep(start, start+oriVL, content)
-						return s.V(), IsJSON(s)
+						s = Str(s).SegRep(start, start+oriVL, content).V()
+						return s, IsJSON(s)
 					}
 
 					//                                                    *** overwrite existing content ***
 					proval := property + ": " + content
-					s = Str(sRep(s.V(), proval, fSf("%s: %v", property, value), 1))
-					return s.V(), IsJSON(s)
+					s = sRep(s, proval, fSf("%s: %v", property, value), 1)
+					return s, IsJSON(s)
 				}
 			}
 		}
 
 		//                                                                    *** new property ***
 		seg := fSf(`, %s: %v}`, property, value)
-		s = s.SegRep(start, start+1, seg)
+		s = Str(s).SegRep(start, start+1, seg).V()
 		mapJBKids[obj] = append(mapJBKids[obj], property)
-		return s.V(), IsJSON(s)
+		return s, IsJSON(s)
 	}
 
-	return s.V(), IsJSON(s)
+	return s, IsJSON(s)
 }
 
 // JSONBuild :
-func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, bool) {
+func JSONBuild(s, iPath, del, property string, value interface{}) (string, bool) {
 	path, indices := IPathToPathIndices(iPath, del)
 	ss := sSpl(path, del)
 	obj := ss[len(ss)-1]
 	content, _ := JSONXPathValue(s, path, del, indices...)
-	objstr, ok := JSONBuildObj(Str(content), obj, property, value, false)
+	objstr, ok := JSONBuildObj(content, obj, property, value, false)
 	return objstr, ok
 }
 

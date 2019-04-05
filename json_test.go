@@ -12,8 +12,8 @@ func TestJSONChild(t *testing.T) {
 	s.SetEnC()
 
 	{
-		fPln(JSONXPathValue(s, "abc ~ subject", " ~ ", 1, 1))
-		fPln(JSONXPathValue(s, "subject", " ~ ", 1))
+		fPln(JSONXPathValue(s.V(), "abc ~ subject", " ~ ", 1, 1))
+		fPln(JSONXPathValue(s.V(), "subject", " ~ ", 1))
 
 		// mapFT := &map[string][]string{}
 		// JSONFamilyTree(s, "xapi", " ~ ", mapFT)
@@ -21,7 +21,7 @@ func TestJSONChild(t *testing.T) {
 
 		fPln(" ----------------------------------------------- ")
 
-		mapFT, mapArrInfo := JSONArrInfo(s, "xapi", " ~ ", "id", nil)
+		mapFT, mapArrInfo := JSONArrInfo(s.V(), "xapi", " ~ ", "id", nil)
 		for k, v := range *mapFT {
 			fPln(k, v)
 		}
@@ -99,7 +99,7 @@ func TestJSONArrInfo(t *testing.T) {
 
 	{
 		mapFT := &map[string][]string{}
-		JSONFamilyTree(sTemp, "", " ~ ", mapFT)
+		JSONFamilyTree(sTemp.V(), "", " ~ ", mapFT)
 		for k, v := range *mapFT {
 			fPln(k, "::", v)
 		}
@@ -113,7 +113,7 @@ func TestJSONArrInfo(t *testing.T) {
 		// Str(newJSON).JSONFamilyTree(root, ".", mapFT)
 		// fPln(*mapFT)
 
-		mapFT, mapAI := JSONArrInfo(s, "", " ~ ", "535e966a-931e-430f-a809-d90401147864", mapFT)
+		mapFT, mapAI := JSONArrInfo(s.V(), "", " ~ ", "535e966a-931e-430f-a809-d90401147864", mapFT)
 		// for k, v := range *mapFT {
 		// 	fPln(k, "::", v)
 		// }
@@ -128,19 +128,19 @@ func TestJSONArrInfo(t *testing.T) {
 
 func TestJSONMake(t *testing.T) {
 
-	StaffPersonal, ok1 := JSONBuildObj(Str(""), "StaffPersonal", "name", "hello", false)
+	StaffPersonal, ok1 := JSONBuildObj("", "StaffPersonal", "name", "hello", false)
 	fPln("11", StaffPersonal, ok1)
 
-	StaffPersonal, ok1 = JSONBuildObj(Str(StaffPersonal), "StaffPersonal", "name1", "staff", false)
+	StaffPersonal, ok1 = JSONBuildObj(StaffPersonal, "StaffPersonal", "name1", "staff", false)
 	fPln("12", StaffPersonal, ok1)
 
-	StaffPersonal, ok1 = JSONBuildObj(Str(StaffPersonal), "StaffPersonal", "age", 11, false)
+	StaffPersonal, ok1 = JSONBuildObj(StaffPersonal, "StaffPersonal", "age", 11, false)
 	fPln("13", StaffPersonal, ok1)
 
-	root, ok := JSONBuildObj(Str(""), "root", "StaffPersonal", "{}", false)
+	root, ok := JSONBuildObj("", "root", "StaffPersonal", "{}", false)
 	fPln("1", root, ok)
 
-	root, ok = JSONBuildObj(Str(root), "root", "StaffPersonal", StaffPersonal, true)
+	root, ok = JSONBuildObj(root, "root", "StaffPersonal", StaffPersonal, false)
 	fPln("1", root, ok)
 
 	
@@ -230,13 +230,13 @@ func TestJSONObjectMerge(t *testing.T) {
 		}
 	}`
 
-	rst := JSONObjectMerge(Str(json1), json2)
+	rst := JSONObjectMerge(json1, json2)
 	ioutil.WriteFile("debug_temp.json", []byte(rst), 0666)
 }
 
 func TestJSONRoot(t *testing.T) {
 	// jsonbytes, _ := ioutil.ReadFile("./test1.json")
-	json := Str(`{
+	json := `{
 		"TeachingGroup": {
 			"RefId": "F47C2C6D-BD49-40E6-A430-360333274DB2",
 			"SchoolYear": "2018",
@@ -257,7 +257,7 @@ func TestJSONRoot(t *testing.T) {
 				}
 			}
 		}
-	}`)
+	}`
 	fPln(JSONFstEle(json))
 	// root, ext, newJSON := Str(json).JSONRootEx("MyRoot")
 	// fPln(root)
