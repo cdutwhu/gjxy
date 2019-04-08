@@ -128,31 +128,52 @@ func TestJSONArrInfo(t *testing.T) {
 
 func TestJSONMake(t *testing.T) {
 
-	StaffPersonal, ok1 := JSONBuildObj("", "StaffPersonal", "name", "hello", false)
-	fPln("11", StaffPersonal, ok1)
+	mIPathObj := map[string]string{}
 
-	StaffPersonal, ok1 = JSONBuildObj(StaffPersonal, "StaffPersonal", "name1", "staff", false)
-	fPln("12", StaffPersonal, ok1)
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "name", "hello world")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "fname", "world")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "gname", "hello")
+	JSONBuildIPath(mIPathObj, "ROOT", "StaffPersonal", "ROOT.StaffPersonal#1")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "NAME", "HELLO WORLD")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "FNAME", "WORLD")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "GNAME", "HELLO")
+	JSONBuildIPath(mIPathObj, "ROOT", "StaffPersonal", "ROOT.StaffPersonal#2")
+	JSONBuildIPath(mIPathObj, "ROOT", "StaffPersonal", "{}")
 
-	StaffPersonal, ok1 = JSONBuildObj(StaffPersonal, "StaffPersonal", "age", 11, false)
-	fPln("13", StaffPersonal, ok1)
+	//fPln(mIPathObj["ROOT"])
+	//fPln("ROOT.StaffPersonal", mIPathObj["ROOT.StaffPersonal"])
 
-	root, ok := JSONBuildObj("", "root", "StaffPersonal", "{}", false)
-	fPln("1", root, ok)
+AGAIN:
+	for k, v := range mIPathObj {
+		for k1, v1 := range mIPathObj {
+			if k == k1 {
+				continue
+			}
+			old := Str(v).RmQuotes(QDouble).V()
+			if sCtn(old, k1) {
+				mIPathObj[k] = sRep(v, "\""+k1+"\"", v1, -1)
+				goto AGAIN
+			}
+		}
+	}
 
-	root, ok = JSONBuildObj(root, "root", "StaffPersonal", StaffPersonal, false)
-	fPln("1", root, ok)
+	fPln(mIPathObj)
+	root := mIPathObj["ROOT"]
 
-	
+	// mIPathStr["ROOT#1.StaffPersonal"] = JSONBuildObj("", "ROOT#1.StaffPersonal", "name", "hello", false)
+	// fPln("11", mIPathStr["ROOT#1.StaffPersonal"])
 
-	// root, ok = JSONBuildObj(Str(root), "root", "StaffPersonal", StaffPersonal, false)
-	// fPln("101", root, ok)
+	// mIPathStr["ROOT#1.StaffPersonal"] = JSONBuildObj(mIPathStr["ROOT#1.StaffPersonal"], "ROOT#1.StaffPersonal", "name1", "staff", false)
+	// fPln("12", mIPathStr["ROOT#1.StaffPersonal"])
 
-	// jsonMap := make(map[string]interface{})
-	// json.Unmarshal([]byte(root), &jsonMap)
-	// for key, value := range jsonMap {
-	// 	fmt.Println("index : ", key, " value : ", value)
-	// }
+	// StaffPersonal, ok1 = JSONBuildObj(StaffPersonal, "ROOT#1.StaffPersonal", "age", 11, false)
+	// fPln("13", StaffPersonal, ok1)
+
+	// root := JSONBuildObj("", "ROOT", "StaffPersonal", "ROOT#1.StaffPersonal", false)
+	// fPln("1", root)
+
+	// root, ok = JSONBuildObj(root, "root", "StaffPersonal", StaffPersonal, true)
+	// fPln("1", root, ok)
 
 	// // //json, ok = Str(json).JSONBuild("StaffPersonal", ".", 1, "-RefId", "{}")
 	// json, ok = JSONBuild(Str(json), "StaffPersonal#1", ".", "LocalId", "946379881")

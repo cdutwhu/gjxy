@@ -100,6 +100,10 @@ func JSONWrapRoot(s, rootExt string) (root string, ext bool, extJSON string) {
 
 // JSONChildValue :                                                                                   ?
 func JSONChildValue(s, child string) (content string, cType JSONTYPE) {
+	if s == "" {
+		return "", JT_UNK
+	}
+
 	PC(!IsJSON(s), fEf("Invalid JSON"))
 	child = Str(child).MkQuotes(QDouble).V()
 	Lc := Str(child).L()
@@ -334,7 +338,7 @@ func JSONArrInfo(s, xpath, del, id string, mapFT *map[string][]string) (*map[str
 }
 
 // JSONObjectMerge :
-func JSONObjectMerge(s, json string) (rst string) {	
+func JSONObjectMerge(s, json string) (rst string) {
 	PC((s != "" && !IsJSON(s)) || !IsJSON(json), fEf("Error: Invalid JSON string"))
 
 	if s == "" {
@@ -355,7 +359,7 @@ func JSONObjectMerge(s, json string) (rst string) {
 }
 
 // JSONBuildObj :
-func JSONBuildObj(s, obj, property string, value interface{}, overwrite bool) (string, bool) {
+func JSONBuildObj(s, obj, property string, value interface{}, overwrite bool) string {
 	defer func() { mapJBPos[obj] = Str(s).L() - 1 }()
 
 	property = Str(property).MkQuotes(QDouble).V()
@@ -368,19 +372,19 @@ func JSONBuildObj(s, obj, property string, value interface{}, overwrite bool) (s
 	}
 
 	s = IF(Str(s).T(BLANK) == "", "{}", s).(string)
-	if s == "{}" { //                                                         *** first element ***
-		s = fSf(`{%s: %s}`, property, value)
+	if s == "{}" { //                                                     *** first element ***
+		s = fSf(`{%s: %v}`, property, value)
 		mapJBKids[obj] = append(mapJBKids[obj], property)
-		return s, IsJSON(s)
+		return s
 	}
 
-	if start, ok := mapJBPos[obj]; ok { //                                    *** existing iPath to add ***
+	if start, ok := mapJBPos[obj]; ok { //                                *** existing iPath to add ***
 
-		if IArrEleIn(property, Strs(mapJBKids[obj])) { //                     *** same property, to merge / overwrite ***
+		if IArrEleIn(property, Strs(mapJBKids[obj])) { //                 *** same property, to merge / overwrite ***
 			// fPln(property, "did before, merge / overwrite into array")
 
 			for _, find := range Str(s).Indices(property) {
-				if Str(s).BracketDepth(BCurly, find) == 1 { //                 *** correct insert position ***
+				if Str(s).BracketDepth(BCurly, find) == 1 { //            *** correct insert position ***
 					start = find + Str(property).L() + 2 //               *** move to behind ": ", so plus 2 ***
 					content, _ := JSONChildValue(s, property)
 					// fPln(content)
@@ -390,36 +394,49 @@ func JSONBuildObj(s, obj, property string, value interface{}, overwrite bool) (s
 						content = Str(content).RmBrackets(BBox).V()
 						content = fSf(`[%s, %v]`, content, value)
 						s = Str(s).SegRep(start, start+oriVL, content).V()
-						return s, IsJSON(s)
+						return s
 					}
 
 					//                                                    *** overwrite existing content ***
 					proval := property + ": " + content
 					s = sRep(s, proval, fSf("%s: %v", property, value), 1)
-					return s, IsJSON(s)
+					return s
 				}
 			}
 		}
 
-		//                                                                    *** new property ***
+		//                                                                *** new property ***
 		seg := fSf(`, %s: %v}`, property, value)
 		s = Str(s).SegRep(start, start+1, seg).V()
 		mapJBKids[obj] = append(mapJBKids[obj], property)
-		return s, IsJSON(s)
+		return s
 	}
 
-	return s, IsJSON(s)
+	return s
 }
 
-// JSONBuild :
-func JSONBuild(s, iPath, del, property string, value interface{}) (string, bool) {
-	path, indices := IPathToPathIndices(iPath, del)
-	ss := sSpl(path, del)
-	obj := ss[len(ss)-1]
-	content, _ := JSONXPathValue(s, path, del, indices...)
-	objstr, ok := JSONBuildObj(content, obj, property, value, false)
-	return objstr, ok
+// JSONBuildIPath :
+func JSONBuildIPath(mIPathObj map[string]string, iPath, property string, value interface{}) string {
+	PC(mIPathObj == nil, fEf("mIPathObj is nil"))
+	if content, ok := mIPathObj[iPath]; ok {
+		mIPathObj[iPath] = JSONBuildObj(content, iPath, property, value, false)
+	} else {
+		mIPathObj[iPath] = JSONBuildObj("", iPath, property, value, false)
+	}
+	PC(!IsJSON(mIPathObj[iPath]), fEf("<%s>: <%s> is not valid JSON string", iPath, mIPathObj[iPath]))
+	return mIPathObj[iPath]
 }
+
+// // JSONBuild :
+// func JSONBuild(s, iPath, del, property string, value interface{}) (string, bool) {
+// 	path, indices := IPathToPathIndices(iPath, del)
+// 	ss := sSpl(path, del)
+// 	exPath, obj := sJ(ss[:len(ss)-1], del), ss[len(ss)-1]
+// 	content, _ := JSONXPathValue(s, path, del, indices...)
+// 	objstr, ok := JSONBuildObj(content, obj, property, value, false)
+// 	root, ok := JSONBuildObj(s, exPath, obj, objstr, true)
+// 	return root, ok
+// }
 
 // // JSONBuild : NOT support mixed (atomic & object) types in one array
 // func JSONBuild(s Str, iPath, del, property string, value interface{}) (string, bool) {

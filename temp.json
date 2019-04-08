@@ -1,1 +1,15 @@
-{"StaffPersonal": [{}, {"name": "hello", "name1": "staff", "age": 11}]}
+{
+    "StaffPersonal": [
+        {
+            "name": "hello world",
+            "fname": "world",
+            "gname": "hello"
+        },
+        {
+            "NAME": "HELLO WORLD",
+            "FNAME": "WORLD",
+            "GNAME": "HELLO"
+        },
+        {}
+    ]
+}
