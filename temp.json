@@ -3,13 +3,34 @@
         {
             "name": "hello world",
             "fname": "world",
-            "gname": "hello"
+            "gname": "hello",
+            "test": {
+                "sub name": "hello sub world",
+                "sub fname": "sub world",
+                "sub gname": "sub hello",
+                "SUB NAME": [
+                    "HELLO SUB WORLD 1",
+                    "HELLO SUB WORLD 2",
+                    "HELLO SUB WORLD 3"
+                ]
+            }
         },
         {
             "NAME": "HELLO WORLD",
             "FNAME": "WORLD",
-            "GNAME": "HELLO"
-        },
-        {}
-    ]
+            "GNAME": "HELLO",
+            "test": {
+                "SUB NAME": [
+                    "HELLO SUB WORLD A",
+                    "HELLO SUB WORLD B",
+                    "HELLO SUB WORLD C",
+                    "HELLO SUB WORLD D"
+                ],
+                "SUB FNAME": "SUB WORLD",
+                "SUB GNAME": "SUB HELLO"
+            }
+        }
+    ],
+    "NAME": "HELLO ROOT",
+    "GNAME": "HELLO"
 }

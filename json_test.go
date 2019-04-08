@@ -138,27 +138,27 @@ func TestJSONMake(t *testing.T) {
 	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "FNAME", "WORLD")
 	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "GNAME", "HELLO")
 	JSONBuildIPath(mIPathObj, "ROOT", "StaffPersonal", "ROOT.StaffPersonal#2")
-	JSONBuildIPath(mIPathObj, "ROOT", "StaffPersonal", "{}")
+	JSONBuildIPath(mIPathObj, "ROOT", "NAME", "HELLO ROOT")
+	JSONBuildIPath(mIPathObj, "ROOT", "GNAME", "HELLO")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1.SubTest", "sub name", "hello sub world")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1.SubTest", "sub fname", "sub world")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "test", "ROOT.StaffPersonal#1.SubTest")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1.SubTest", "sub gname", "sub hello")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB NAME", "HELLO SUB WORLD A")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB NAME", "HELLO SUB WORLD B")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB NAME", "HELLO SUB WORLD C")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB NAME", "HELLO SUB WORLD D")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1.SubTest", "SUB NAME", "HELLO SUB WORLD 1")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1.SubTest", "SUB NAME", "HELLO SUB WORLD 2")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1.SubTest", "SUB NAME", "HELLO SUB WORLD 3")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB FNAME", "SUB WORLD")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "test", "ROOT.StaffPersonal#2.SubTest")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB GNAME", "SUB HELLO")
 
 	//fPln(mIPathObj["ROOT"])
 	//fPln("ROOT.StaffPersonal", mIPathObj["ROOT.StaffPersonal"])
 
-AGAIN:
-	for k, v := range mIPathObj {
-		for k1, v1 := range mIPathObj {
-			if k == k1 {
-				continue
-			}
-			old := Str(v).RmQuotes(QDouble).V()
-			if sCtn(old, k1) {
-				mIPathObj[k] = sRep(v, "\""+k1+"\"", v1, -1)
-				goto AGAIN
-			}
-		}
-	}
-
-	fPln(mIPathObj)
-	root := mIPathObj["ROOT"]
+	root := JSONBuildIPathRep(mIPathObj, ".")	
 
 	// mIPathStr["ROOT#1.StaffPersonal"] = JSONBuildObj("", "ROOT#1.StaffPersonal", "name", "hello", false)
 	// fPln("11", mIPathStr["ROOT#1.StaffPersonal"])

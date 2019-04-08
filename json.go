@@ -427,6 +427,35 @@ func JSONBuildIPath(mIPathObj map[string]string, iPath, property string, value i
 	return mIPathObj[iPath]
 }
 
+// JSONBuildIPathRep :
+func JSONBuildIPathRep(mIPathObj map[string]string, del string) string {
+	K := ""
+	keys := GetMapKeys(mIPathObj).([]string)
+	for _, k := range keys {
+		if !sCtn(k, del) {
+			K = k
+			break
+		}
+	}
+	PC(K == "", fEf("ROOT error"))
+
+AGAIN:
+	for k, v := range mIPathObj {
+		for k1, v1 := range mIPathObj {
+			if k == k1 {
+				continue
+			}
+			old := Str(v).RmQuotes(QDouble).V()
+			if sCtn(old, k1) {
+				mIPathObj[k] = sRep(v, "\""+k1+"\"", v1, -1)
+				goto AGAIN
+			}
+		}
+	}
+
+	return mIPathObj[K]
+}
+
 // // JSONBuild :
 // func JSONBuild(s, iPath, del, property string, value interface{}) (string, bool) {
 // 	path, indices := IPathToPathIndices(iPath, del)
