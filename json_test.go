@@ -92,40 +92,6 @@ func TestJSONChild(t *testing.T) {
 	// }
 }
 
-func TestJSONArrInfo(t *testing.T) {
-	jsonBytesTemp, _ := ioutil.ReadFile("xapi.json")
-	sTemp := Str(jsonBytesTemp)
-	fPln(sTemp.SetEnC())
-
-	{
-		mapFT := &map[string][]string{}
-		JSONFamilyTree(sTemp.V(), "", " ~ ", mapFT)
-		for k, v := range *mapFT {
-			fPln(k, "::", v)
-		}
-
-		jsonBytes, _ := ioutil.ReadFile("xapi.1.json")
-		s := Str(jsonBytes)
-		fPln(s.SetEnC())
-
-		// mapFT = &map[string][]string{}
-		// root, _, newJSON := JSONRootEx(s, "fakeRoot")
-		// Str(newJSON).JSONFamilyTree(root, ".", mapFT)
-		// fPln(*mapFT)
-
-		mapFT, mapAI := JSONArrInfo(s.V(), "", " ~ ", "535e966a-931e-430f-a809-d90401147864", mapFT)
-		// for k, v := range *mapFT {
-		// 	fPln(k, "::", v)
-		// }
-		fPln("----------------------------------------------------------------------")
-		if mapAI != nil {
-			for k, v := range *mapAI {
-				fPln(k, "::", v)
-			}
-		}
-	}
-}
-
 func TestJSONMake(t *testing.T) {
 
 	mIPathObj := map[string]string{}
@@ -158,7 +124,7 @@ func TestJSONMake(t *testing.T) {
 	//fPln(mIPathObj["ROOT"])
 	//fPln("ROOT.StaffPersonal", mIPathObj["ROOT.StaffPersonal"])
 
-	root := JSONBuildIPathRep(mIPathObj, ".")	
+	root := JSONBuildIPathRep(mIPathObj, ".")
 
 	// mIPathStr["ROOT#1.StaffPersonal"] = JSONBuildObj("", "ROOT#1.StaffPersonal", "name", "hello", false)
 	// fPln("11", mIPathStr["ROOT#1.StaffPersonal"])
@@ -213,7 +179,11 @@ func TestJSONMake(t *testing.T) {
 
 func TestJSONObjectMerge(t *testing.T) {
 
-	json1 := ``
+	json1 := `{
+		"TeachingGroup1": {
+			"RefId": "F47C2C6D-BD49-40E6-A430-111111111112"
+		}
+	}`
 	json2 := `{
 		"TeachingGroup1": {
 			"RefId": "F47C2C6D-BD49-40E6-A430-111111111111",
@@ -252,7 +222,7 @@ func TestJSONObjectMerge(t *testing.T) {
 	}`
 
 	rst := JSONObjectMerge(json1, json2)
-	ioutil.WriteFile("debug_temp.json", []byte(rst), 0666)
+	ioutil.WriteFile("test_temp.json", []byte(rst), 0666)
 }
 
 func TestJSONRoot(t *testing.T) {
@@ -296,43 +266,4 @@ func TestJSONRoot(t *testing.T) {
 	// 		fPln(k, v)
 	// 	}
 	// }
-}
-
-func TestGQLBuild(t *testing.T) {
-	s := Str(`
-type StaffPersonal {
-	-RefId: String
-	LocalId: String
-	StateProvinceId: String
-	OtherIdList: OtherIdList
-}
-	
-type OtherIdList {
-	OtherId: OtherId
-}
-
-type OtherIdList1 {
-	OtherId1: OtherId1
-}
-
-type OtherIdList2 {
-	OtherId2: OtherId2
-}
-	
-type OtherId {
-	-Type: String
-}`)
-
-	s = Str(SchemaBuild(s, "OtherIdList2", "OtherId2", "String"))
-
-	// s := Str("")
-	// s = Str(s.GQLBuild("StaffPersonal", "RefId", "String"))
-	// s = Str(s.GQLBuild("StaffPersonal", "LocalId", "String"))
-	// s = Str(s.GQLBuild("Recent", "SchoolLocalId", "String"))
-	// s = Str(s.GQLBuild("Recent", "LocalCampusId", "String"))
-	// s = Str(s.GQLBuild("StaffPersonal", "StateProvinceId", "String"))
-	// s = Str(s.GQLBuild("NAPLANClassListType", "ClassCode", "[String]"))
-	// s = Str(s.GQLBuild("StaffPersonal", "OtherIdList", "OtherIdList"))
-
-	fPln(s)
 }
