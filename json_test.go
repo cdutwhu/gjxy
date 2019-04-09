@@ -21,7 +21,7 @@ func TestJSONChild(t *testing.T) {
 
 		fPln(" ----------------------------------------------- ")
 
-		mapFT, mapArrInfo := JSONArrInfo(s.V(), "xapi", " ~ ", "id", nil)
+		mapFT, mapArrInfo := JSONArrInfo(s.V(), "xapi", " ~ ", "GUID", nil)
 		for k, v := range *mapFT {
 			fPln(k, v)
 		}
@@ -37,8 +37,14 @@ func TestJSONChild(t *testing.T) {
 	// fPln(jsonSample.IsJSON())
 	// fPln(jsonSample.IsJSONArray())
 
-	// jsonSample = Str(` {"root" : 12334.34, "test": [ 1, 3, 4 ] } `)
-	// fPln(jsonSample.IsJSONSingle())
+	jsonSample := `{ 		
+		"ROOT" : { 
+		    "root" : 12334.34, 
+		    "test": [ 1, 3, 4 ] 
+		}
+	}`
+	// jsonSample := `{ "score" : 123, "age": 10  }`
+	fPln(IsJSONSingle(jsonSample))
 	// fPln(jsonSample.JSONChildValue("root"))
 	// fPln(jsonSample.JSONWrapRoot("Root"))
 

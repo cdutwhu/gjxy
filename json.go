@@ -25,8 +25,16 @@ func IsJSONSingle(s string) (ok bool, tag string) {
 	S := Str(s).T(BLANK)
 	if S.C(0) == '{' && S.C(LAST) == '}' {
 		S = S.S(1, ALL-1).T(BLANK)
-		if S.QuotePairCount(QDouble) == 1 {
-			ok, tag = true, S.S(0, S.Idx(":")).RmQuotes(QDouble).V()
+		switch S.BracketPairCount(BCurly) {
+		case 0:
+			if sCnt(S.V(), ":") == 1 {
+				ok, tag = true, S.S(0, S.Idx(":")).T(BLANK).RmQuotes(QDouble).V()
+			}
+		case 1:
+			leftS := S.S(0, S.Idx("{")).V()
+			if sCnt(leftS, ":") == 1 && sCnt(leftS, ",") == 0 && S.C(LAST) == '}' {
+				ok, tag = true, S.S(0, S.Idx(":")).T(BLANK).RmQuotes(QDouble).V()
+			}
 		}
 	}
 	return
