@@ -21,16 +21,25 @@ func TestXML(t *testing.T) {
 	}
 	fPln(" --------------------------------------- ")	
 
-	mapFT := &map[string][]string{}
-	XMLFamilyTree(str, "", " ~ ", mapFT)
-	//fPln((*mapFT))
-	for k, v := range (*mapFT) {
+	// mapFT := &map[string][]string{}
+	// XMLFamilyTree(str, "", " ~ ", mapFT)
+	// //fPln((*mapFT))
+	// for k, v := range (*mapFT) {
+	// 	fPln(k, v)
+	// }
+	// fPln(" --------------------------------------- ")
+
+	// XMLCntByIPath(str, "SchoolCourseInfo#1", " ~ ", mapFT)
+	// fPln(" --------------------------------------- ")
+
+	mFT, mArr := XMLCntInfo(str, "", " ~ ", "ArrGUID", nil)
+	for k, v := range (*mFT) {
 		fPln(k, v)
 	}
-	fPln(" --------------------------------------- ")
-
-	XMLArrByIPath(str, "SchoolCourseInfo#1", " ~ ", mapFT)
-	fPln(" --------------------------------------- ")
+	fPln(" -------------------- ")
+	for k, v := range (*mArr) {
+		fPln(k, v)
+	}
 
 	return
 

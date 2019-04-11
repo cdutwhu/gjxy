@@ -30,6 +30,13 @@
             <Code>Mathematics</Code>
             <Test>789</Test>
         </SubjectArea>
+        <SubjectArea>
+            <Code>Mathematics 1A</Code>
+            <Code>Mathematics 2A</Code>            
+            <Test>789A</Test>
+            <Test>789B</Test>
+            <Test>789C</Test>
+        </SubjectArea>
     </SubjectAreaList>
     <CourseTitle>Mathematics 7</CourseTitle>
     <CourseTitle>Mathematics 9</CourseTitle>

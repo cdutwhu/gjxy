@@ -162,61 +162,83 @@ func XMLFamilyTree(xml, fName, del string, mapFT *map[string][]string) {
 	}
 }
 
-// // XMLYieldArrInfo :
-// func XMLYieldArrInfo(xmlstr string, ids, objs []string, mapkeyprefix, pathDel, childDel string, eleObjIDArrcnts *[]pathIDn) {
-// 	if len(mapkeyprefix) > 0 {
-// 		mapkeyprefix += pathDel
-// 	}
-// 	for i, obj := range objs {
-// 		curPath := mapkeyprefix + obj
-
-// 		xmlele := XMLEleStrByTag(xmlstr, obj, 1)
-// 		uids, children, _, arrCnt := XMLFindChildren(xmlele, ids[i], childDel) /* uniform ids, children */
-// 		attributes, _, _ := XMLFindAttributes(xmlele, childDel)                /* attributes */
-
-// 		/* array children info */
-// 		if arrCnt > 0 {
-// 			(*eleObjIDArrcnts) = append((*eleObjIDArrcnts), pathIDn{arrPath: curPath + pathDel + children[0], objID: ids[i], arrCnt: arrCnt})
-// 		}
-
-// 		if len(children) == 0 && len(attributes) == 0 { /* attributes */
-// 			continue
-// 		} else {
-// 			XMLYieldArrInfo(xmlele, uids, children, curPath, pathDel, childDel, eleObjIDArrcnts) /* recursive */
-// 		}
-// 	}
-// }
-
-// XMLArrByIPath :
-func XMLArrByIPath(xml, iPath, del string, mapFT *map[string][]string) (arrNames []string, arrCnts []int, nextIPaths []string) {
+// XMLCntByIPath : dump all leaves, non-array leaves can be removed later.
+func XMLCntByIPath(xml, iPath, del string, mapFT *map[string][]string) (arrNames []string, arrCnts []int, nextIPaths []string) {
 	path, indices := IPathToPathIndices(iPath, del) //         *** defined in <json.go> ***
-	fPln("indices:", indices)
+	// fPln("indices:", indices)
 
 	leaves := (*mapFT)[path]
 	for _, leaf := range leaves {
 		// fPln(leaf)
 		LEAF := Str(leaf)
+
+		arrName := LEAF.V()
 		if LEAF.HP("[]") {
-			arrName := LEAF.S(2, ALL).V()
-			// fPln(arrName)
+			arrName = LEAF.S(2, ALL).V()
+		}
+		_, nArr := XMLXPathEle(xml, path+del+arrName, del, append(indices, 1)...)
+		// fPln(nArr)
 
-			_, nArr := XMLXPathEle(xml, path+del+arrName, del, append(indices, 1)...)
-			// fPln(nArr)
+		arrNames = append(arrNames, arrName)
+		arrCnts = append(arrCnts, nArr)
 
-			arrNames = append(arrNames, arrName)
-			arrCnts = append(arrCnts, nArr)
-
-			for i := 1; i <= nArr; i++ {
-				nextIPath := iPath + del + arrName + fSf("#%d", i)
-				// fPln(nextIPath)
-				nextIPaths = append(nextIPaths, nextIPath)
-			}
+		for i := 1; i <= nArr; i++ {
+			nextIPath := iPath + del + arrName + fSf("#%d", i)
+			// fPln(nextIPath)
+			nextIPaths = append(nextIPaths, nextIPath)
 		}
 	}
 	return
 }
 
+// XMLWholeCntByIPathByR :
+func XMLWholeCntByIPathByR(xml, iPath, del, id string, mapFT *map[string][]string, mapIPathNID *map[string]struct {
+	Count int
+	ID    string
+}) {
+	PC(mapIPathNID == nil, fEf("result <mapIPathNID> is not initialized"))
+	arrNames, arrCnts, subIPaths := XMLCntByIPath(xml, iPath, del, mapFT)
+	PC(len(arrNames) != len(arrCnts), fEf("error in XMLCntByIPath"))
 
+	nNames := len(arrNames)
+	for i := 0; i < nNames; i++ {
+		(*mapIPathNID)[iPath+del+arrNames[i]] = struct {
+			Count int
+			ID    string
+		}{
+			Count: arrCnts[i],
+			ID:    id,
+		}
+	}
+	for _, subIPath := range subIPaths {
+		XMLWholeCntByIPathByR(xml, subIPath, del, id, mapFT, mapIPathNID)
+	}
+}
+
+// XMLCntInfo :
+func XMLCntInfo(xml, xpath, del, id string, mapFT *map[string][]string) (*map[string][]string, *map[string]struct {
+	Count int
+	ID    string
+}) {
+	if mapFT == nil {
+		mapFT = &map[string][]string{}
+		XMLFamilyTree(xml, xpath, del, mapFT)
+	}
+
+	// fPln(" ------------------------------------------ ")
+
+	root := XMLTag(xml)
+	fPf("ROOT is <%s>\n", root)
+	PC(root == "", fEf("Invalid path"))
+
+	iRoot := root + "#1"
+	mapIPathNID := &map[string]struct {
+		Count int
+		ID    string
+	}{}
+	XMLWholeCntByIPathByR(xml, iRoot, del, id, mapFT, mapIPathNID)
+	return mapFT, mapIPathNID
+}
 
 /**********************************************************************************************************************************/
 
