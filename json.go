@@ -228,11 +228,11 @@ func JSONFamilyTree(s, fName, del string, mapFT *map[string][]string) {
 	if children := JSONObjChildren(s); len(children) > 0 {
 		fPln(fName, children) // DEBUG
 
-		(*mapFT)[fName] = children //                         *** record path ***
+		(*mapFT)[fName] = children //                        *** record path ***
 
 		for _, child := range children {
-			if Str(child).HP("[]") {
-				child = Str(child).S(2, ALL).V()
+			if Str(child).HP("[") {
+				child = Str(child).RmHeadToLast("]").V() //  *** remove array symbol ***
 			}
 			nextPath := Str(fName + del + child).T(del).V()
 			indices := []int{}
@@ -266,9 +266,9 @@ func JSONArrByIPath(s, iPath, del string, mapFT *map[string][]string) (arrNames 
 	leaves := (*mapFT)[path]
 	for _, leaf := range leaves {
 		// fPln(leaf)
-		sLeaf := Str(leaf)
-		if sLeaf.HP("[]") {
-			arrName := sLeaf.S(2, ALL).V()
+		LEAF := Str(leaf)
+		if LEAF.HP("[]") {
+			arrName := LEAF.S(2, ALL).V()
 			// fPln(arrName)
 			_, nArr := JSONXPathValue(s, path+del+arrName, del, append(indices, 1)...)
 			// fPln(nArr)

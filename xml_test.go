@@ -10,13 +10,16 @@ func TestXML(t *testing.T) {
 	sif := Str(sifbytes)
 	sif.SetEnC()
 
-	// str := XMLTagEleEx(sif.V(), "CourseTitle", 3)
-	// fPln(str)
+	// str1, nArr := XMLTagEleEx(sif.V(), "CourseTitle", 3)
+	// fPln(str1, nArr)
 	// fPln(" --------------------------------------- ")
 
-	str := XMLXPathEle(sif.V(), "SchoolCourseInfo", " ~ ", 1)
-	fPln(str)
-	fPln(" --------------------------------------- ")
+	str, nArr := XMLXPathEle(sif.V(), "SchoolCourseInfo ~ CourseTitle", " ~ ", 1, 2)
+	fPln(str, nArr)
+	if str == "" {
+		return
+	}
+	fPln(" --------------------------------------- ")	
 
 	mapFT := &map[string][]string{}
 	XMLFamilyTree(str, "", " ~ ", mapFT)

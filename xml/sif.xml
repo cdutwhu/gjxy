@@ -28,7 +28,7 @@
         </SubjectArea>
         <SubjectArea>
             <Code>Mathematics</Code>
-            <Test>789</Test>            
+            <Test>789</Test>
         </SubjectArea>
     </SubjectAreaList>
     <CourseTitle>Mathematics 7</CourseTitle>
@@ -36,7 +36,7 @@
     <CourseTitle>Mathematics 10</CourseTitle>
     <CourseCredits>2</CourseCredits>
 </SchoolCourseInfo>
-    
+
 <SchoolCourseInfo RefId="46F3503C-C6D5-4BE8-ABB8-D3B5FE853948">
     <SchoolInfoRefId>738F4DF5-949F-4380-8186-8252440A6F6F</SchoolInfoRefId>
     <SchoolYear>2018</SchoolYear>
@@ -49,7 +49,7 @@
     <CourseTitle>Mathematics 8</CourseTitle>
     <CourseCredits>2</CourseCredits>
 </SchoolCourseInfo>
-    
+
 <SchoolCourseInfo RefId="2041B8B8-B238-4AAD-9013-8E166E9ABBB4">
     <SchoolInfoRefId>738F4DF5-949F-4380-8186-8252440A6F6F</SchoolInfoRefId>
     <SchoolYear>2018</SchoolYear>
@@ -62,71 +62,71 @@
     <CourseTitle>Geography 7</CourseTitle>
     <CourseCredits>2</CourseCredits>
 </SchoolCourseInfo>
-    
-    <SchoolCourseInfo RefId="FE2F9EFC-5B0D-4465-9C95-2656C05273E6">
+
+<SchoolCourseInfo RefId="FE2F9EFC-5B0D-4465-9C95-2656C05273E6">
     <SchoolInfoRefId>738F4DF5-949F-4380-8186-8252440A6F6F</SchoolInfoRefId>
     <SchoolYear>2018</SchoolYear>
     <CourseCode>Geography 801</CourseCode>
     <SubjectAreaList>
-    <SubjectArea>
-    <Code>Geography</Code>
-    </SubjectArea>
+        <SubjectArea>
+            <Code>Geography</Code>
+        </SubjectArea>
     </SubjectAreaList>
     <CourseTitle>Geography 8</CourseTitle>
     <CourseCredits>2</CourseCredits>
-    </SchoolCourseInfo>
-    
-    <SchoolCourseInfo RefId="D7E639A2-FBA7-4668-B360-C9198FDB542E">
+</SchoolCourseInfo>
+
+<SchoolCourseInfo RefId="D7E639A2-FBA7-4668-B360-C9198FDB542E">
     <SchoolInfoRefId>738F4DF5-949F-4380-8186-8252440A6F6F</SchoolInfoRefId>
     <SchoolYear>2018</SchoolYear>
     <CourseCode>History 701</CourseCode>
     <SubjectAreaList>
-    <SubjectArea>
-    <Code>History</Code>
-    </SubjectArea>
+        <SubjectArea>
+            <Code>History</Code>
+        </SubjectArea>
     </SubjectAreaList>
     <CourseTitle>History 7</CourseTitle>
     <CourseCredits>2</CourseCredits>
-    </SchoolCourseInfo>
-    
-    <SchoolCourseInfo RefId="D5744A21-FCB9-42BE-8F54-9C18229D7617">
+</SchoolCourseInfo>
+
+<SchoolCourseInfo RefId="D5744A21-FCB9-42BE-8F54-9C18229D7617">
     <SchoolInfoRefId>738F4DF5-949F-4380-8186-8252440A6F6F</SchoolInfoRefId>
     <SchoolYear>2018</SchoolYear>
     <CourseCode>History 801</CourseCode>
     <SubjectAreaList>
-    <SubjectArea>
-    <Code>History</Code>
-    </SubjectArea>
+        <SubjectArea>
+            <Code>History</Code>
+        </SubjectArea>
     </SubjectAreaList>
     <CourseTitle>History 8</CourseTitle>
     <CourseCredits>2</CourseCredits>
-    </SchoolCourseInfo>
-    
-    <SchoolCourseInfo RefId="1B8048DC-CFB0-4E18-BDAE-024185107FED">
+</SchoolCourseInfo>
+
+<SchoolCourseInfo RefId="1B8048DC-CFB0-4E18-BDAE-024185107FED">
     <SchoolInfoRefId>738F4DF5-949F-4380-8186-8252440A6F6F</SchoolInfoRefId>
     <SchoolYear>2018</SchoolYear>
     <CourseCode>English 701</CourseCode>
     <SubjectAreaList>
-    <SubjectArea>
-    <Code>English</Code>
-    </SubjectArea>
+        <SubjectArea>
+            <Code>English</Code>
+        </SubjectArea>
     </SubjectAreaList>
     <CourseTitle>English 7</CourseTitle>
     <CourseCredits>2</CourseCredits>
-    </SchoolCourseInfo>
-    
-    <SchoolCourseInfo RefId="5CFBDF5E-9216-4AC4-8A20-A610E5B30BE9">
+</SchoolCourseInfo>
+
+<SchoolCourseInfo RefId="5CFBDF5E-9216-4AC4-8A20-A610E5B30BE9">
     <SchoolInfoRefId>738F4DF5-949F-4380-8186-8252440A6F6F</SchoolInfoRefId>
     <SchoolYear>2018</SchoolYear>
     <CourseCode>English 801</CourseCode>
     <SubjectAreaList>
-    <SubjectArea>
-    <Code>English</Code>
-    </SubjectArea>
+        <SubjectArea>
+            <Code>English</Code>
+        </SubjectArea>
     </SubjectAreaList>
     <CourseTitle>English 8</CourseTitle>
     <CourseCredits>2</CourseCredits>
-    </SchoolCourseInfo>
+</SchoolCourseInfo>
     
       <TimeTableSubject RefId="5DC8EF27-B4A0-4153-954D-84153F1D591D">
       <SubjectLocalId>Mathematics 7 001</SubjectLocalId>

@@ -34,16 +34,18 @@ func XMLTagEle(xml, tag string) (string, int, int) {
 }
 
 // XMLTagEleEx : idx from 1
-func XMLTagEleEx(xml, tag string, idx int) string {
-	esum := 0
-	for i := 1; i <= idx; i++ {
+func XMLTagEleEx(xml, tag string, idx int) (string, int) {
+	const LIMIT = 4096
+	PC(idx > LIMIT || idx < 1, fEf("idx starts from 1, to %d", LIMIT))
+	esum, rst := 0, ""
+	for i := 1; i <= LIMIT; i++ { //                      *** set a limit for searching ***
 		XML := Str(xml).S(esum, ALL)
 		ele, _, e := XMLTagEle(XML.V(), tag)
 		if e == -1 {
-			return ""
+			return rst, i - 1
 		}
 		if i == idx {
-			return ele
+			rst = ele
 		}
 		esum += e
 	}
@@ -51,7 +53,7 @@ func XMLTagEleEx(xml, tag string, idx int) string {
 }
 
 // XMLXPathEle :
-func XMLXPathEle(xml, xpath, del string, indices ...int) (ele string) {
+func XMLXPathEle(xml, xpath, del string, indices ...int) (ele string, nArr int) {
 	PC(xpath == "", fEf("At least one path must be provided"))
 
 	segs := sSpl(xpath, del)
@@ -59,7 +61,7 @@ func XMLXPathEle(xml, xpath, del string, indices ...int) (ele string) {
 
 	for i, seg := range segs {
 		xml = IF(ele != "", ele, xml).(string)
-		ele = XMLTagEleEx(xml, seg, indices[i])
+		ele, nArr = XMLTagEleEx(xml, seg, indices[i])
 	}
 	return
 }
@@ -147,11 +149,11 @@ func XMLFamilyTree(xml, fName, del string, mapFT *map[string][]string) {
 		(*mapFT)[fName] = children //                           *** record path ***
 
 		for _, child := range children {
-			if Str(child).HP("[") {				
+			if Str(child).HP("[") {
 				child = Str(child).RmHeadToLast("]").V() //     *** remove array symbol ***
 			}
 			nextPath := Str(fName + del + child).T(del).V()
-			subxml := XMLTagEleEx(xml, child, 1)
+			subxml, _ := XMLTagEleEx(xml, child, 1)
 			XMLFamilyTree(subxml, nextPath, del, mapFT)
 		}
 	}
@@ -181,6 +183,26 @@ func XMLFamilyTree(xml, fName, del string, mapFT *map[string][]string) {
 // 		}
 // 	}
 // }
+
+// XMLArrByIPath :
+func XMLArrByIPath(xml, iPath, del string, mapFT *map[string][]string) (arrNames []string, arrCnts []int, nextIPaths []string) {
+	path, indices := IPathToPathIndices(iPath, del) //         *** defined in <json.go> ***
+	fPln("indices:", indices)
+
+	leaves := (*mapFT)[path]
+	for _, leaf := range leaves {
+		fPln(leaf)
+		LEAF := Str(leaf)
+		if LEAF.HP("[]") {
+			arrName := LEAF.S(2, ALL).V()
+			fPln(arrName)
+
+			// XMLXPathEle()
+
+		}
+	}
+	return
+}
 
 /**********************************************************************************************************************************/
 
