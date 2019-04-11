@@ -26,12 +26,10 @@ func TestXML(t *testing.T) {
 	}
 	fPln(" --------------------------------------- ")
 
-	return
-
 	fPln(XMLAttributes(str, "-"))
 	fPln(" --------------------------------------- ")
 
-	fPln(XMLChildren(str))
+	fPln(XMLChildren(str, true))
 	fPln(" --------------------------------------- ")
 
 	tag, xml, l, r := XMLSegPos(sif, 3, 1)

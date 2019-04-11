@@ -28,8 +28,7 @@
         </SubjectArea>
         <SubjectArea>
             <Code>Mathematics</Code>
-            <Test>789</Test>
-            <Test>AAA</Test>
+            <Test>789</Test>            
         </SubjectArea>
     </SubjectAreaList>
     <CourseTitle>Mathematics 7</CourseTitle>

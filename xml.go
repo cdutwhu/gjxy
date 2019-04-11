@@ -82,9 +82,9 @@ func XMLAttributes(xmlele, attrPF string) (attributes, attriValues []string) { /
 }
 
 // XMLChildren : (NOT search grandchildren)
-func XMLChildren(xmlele string) (children []string) {
+func XMLChildren(xmlele string, fNArr bool) (children []string) {
 	XMLELE := Str(xmlele).T(BLANK)
-	PC(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Not a valid XML section"))
+	PC(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Invalid XML section"))
 
 	L := XMLELE.L()
 	skip, childpos, level, inflag := false, []int{}, 0, false
@@ -130,26 +130,25 @@ func XMLChildren(xmlele string) (children []string) {
 		children = append(children, child.V())
 	}
 
-	children = IArrFoldRep(Strs(children), "[]").([]string)
+	children = IArrFoldRep(Strs(children), IF(fNArr, "[n]", "[]").(string)).([]string)
 	return
 }
 
 // XMLFamilyTree : ******************************************************************************************
 func XMLFamilyTree(xml, fName, del string, mapFT *map[string][]string) {
-	XML := Str(xml).T(BLANK)
-	PC(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Not a valid XML section"))
 	PC(mapFT == nil, fEf("FamilyTree return map is not initialised !"))
+	XML := Str(xml).T(BLANK)
+	PC(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Invalid XML section"))
 
 	fName = IF(fName == "", XMLTag(xml), fName).(string)
-
-	if children := XMLChildren(xml); len(children) > 0 {
+	if children := XMLChildren(xml, false); len(children) > 0 {
 		// fPln(tag, children)
 
 		(*mapFT)[fName] = children //                           *** record path ***
 
 		for _, child := range children {
-			if Str(child).HP("[]") {
-				child = Str(child).S(2, ALL).V()
+			if Str(child).HP("[") {				
+				child = Str(child).RmHeadToLast("]").V() //     *** remove array symbol ***
 			}
 			nextPath := Str(fName + del + child).T(del).V()
 			subxml := XMLTagEleEx(xml, child, 1)
@@ -157,6 +156,33 @@ func XMLFamilyTree(xml, fName, del string, mapFT *map[string][]string) {
 		}
 	}
 }
+
+// // XMLYieldArrInfo :
+// func XMLYieldArrInfo(xmlstr string, ids, objs []string, mapkeyprefix, pathDel, childDel string, eleObjIDArrcnts *[]pathIDn) {
+// 	if len(mapkeyprefix) > 0 {
+// 		mapkeyprefix += pathDel
+// 	}
+// 	for i, obj := range objs {
+// 		curPath := mapkeyprefix + obj
+
+// 		xmlele := XMLEleStrByTag(xmlstr, obj, 1)
+// 		uids, children, _, arrCnt := XMLFindChildren(xmlele, ids[i], childDel) /* uniform ids, children */
+// 		attributes, _, _ := XMLFindAttributes(xmlele, childDel)                /* attributes */
+
+// 		/* array children info */
+// 		if arrCnt > 0 {
+// 			(*eleObjIDArrcnts) = append((*eleObjIDArrcnts), pathIDn{arrPath: curPath + pathDel + children[0], objID: ids[i], arrCnt: arrCnt})
+// 		}
+
+// 		if len(children) == 0 && len(attributes) == 0 { /* attributes */
+// 			continue
+// 		} else {
+// 			XMLYieldArrInfo(xmlele, uids, children, curPath, pathDel, childDel, eleObjIDArrcnts) /* recursive */
+// 		}
+// 	}
+// }
+
+/**********************************************************************************************************************************/
 
 // XMLSegPos : level from 1, index from 1                                         &
 func XMLSegPos(s Str, level, index int) (tag, str string, left, right int) {
