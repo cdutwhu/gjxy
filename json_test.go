@@ -37,13 +37,13 @@ func TestJSONChild(t *testing.T) {
 	// fPln(jsonSample.IsJSON())
 	// fPln(jsonSample.IsJSONArray())
 
-	jsonSample := `{ 		
-		"ROOT" : { 
-		    "root" : 12334.34, 
-		    "test": [ 1, 3, 4 ] 
-		}
-	}`
-	// jsonSample := `{ "score" : 123, "age": 10  }`
+	// jsonSample := `{ 		
+	// 	"ROOT" : { 
+	// 	    "root" : 12334.34, 
+	// 	    "test": [ 1, 3, 4 ] 
+	// 	}
+	// }`
+	jsonSample := `{ "score" : 123, "age": 10  }`
 	fPln(IsJSONSingle(jsonSample))
 	// fPln(jsonSample.JSONChildValue("root"))
 	// fPln(jsonSample.JSONWrapRoot("Root"))

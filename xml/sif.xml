@@ -1,5 +1,6 @@
 
-<SchoolInfo RefId="738F4DF5-949F-4380-8186-8252440A6F6F">
+
+<SchoolInfo RefId="738F4DF5-949F-4380-8186-8252440A6F6F" test="hello">
     <LocalId>01011234</LocalId>
     <StateProvinceId>01011234</StateProvinceId>
     <CommonwealthId>012345</CommonwealthId>
@@ -11,6 +12,7 @@
         <SchoolFocus>03</SchoolFocus>
     </SchoolFocusList>
     <SchoolURL>http://www.lincolnsc.edu.vic.au</SchoolURL>
+    <SchoolURL>http://www.lincolnsc.edu.vic</SchoolURL>
     <SchoolSector>Gov</SchoolSector>
 </SchoolInfo>
 
@@ -21,9 +23,18 @@
     <SubjectAreaList>
         <SubjectArea>
             <Code>Mathematics</Code>
+            <Test>123</Test>
+            <Test>456</Test>
+        </SubjectArea>
+        <SubjectArea>
+            <Code>Mathematics</Code>
+            <Test>789</Test>
+            <Test>AAA</Test>
         </SubjectArea>
     </SubjectAreaList>
     <CourseTitle>Mathematics 7</CourseTitle>
+    <CourseTitle>Mathematics 9</CourseTitle>
+    <CourseTitle>Mathematics 10</CourseTitle>
     <CourseCredits>2</CourseCredits>
 </SchoolCourseInfo>
     

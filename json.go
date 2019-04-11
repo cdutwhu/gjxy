@@ -12,10 +12,7 @@ func IsJSON(s string) bool {
 func JSONFstEle(s string) string {
 	PC(!IsJSON(s), fEf("Invalid JSON"))
 	str := Str(s).T(BLANK).RmBrackets(BCurly).T(BLANK)
-	if p := str.Idx(":"); p > 0 {
-		str = str.S(0, p)
-		str = str.T(BLANK)
-	}
+	str = str.STo(":").T(BLANK)
 	return str.RmQuotes(QDouble).V()
 }
 
@@ -28,12 +25,12 @@ func IsJSONSingle(s string) (ok bool, tag string) {
 		switch S.BracketPairCount(BCurly) {
 		case 0:
 			if sCnt(S.V(), ":") == 1 {
-				ok, tag = true, S.S(0, S.Idx(":")).T(BLANK).RmQuotes(QDouble).V()
+				ok, tag = true, S.STo(":").T(BLANK).RmQuotes(QDouble).V()
 			}
 		case 1:
-			leftS := S.S(0, S.Idx("{")).V()
+			leftS := S.STo("{").V()
 			if sCnt(leftS, ":") == 1 && sCnt(leftS, ",") == 0 && S.C(LAST) == '}' {
-				ok, tag = true, S.S(0, S.Idx(":")).T(BLANK).RmQuotes(QDouble).V()
+				ok, tag = true, S.STo(":").T(BLANK).RmQuotes(QDouble).V()
 			}
 		}
 	}

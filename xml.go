@@ -1,5 +1,163 @@
 package gjxy
 
+// XMLTag : get the xml string's first tag
+func XMLTag(xml string) string {
+	XML := Str(xml).T(BLANK)
+	PC(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Not a valid XML section"))
+	return XML.S(XML.LIdx("</")+2, ALL-1).V()
+}
+
+// XMLTagEle : Looking for the first tag's xml string
+func XMLTagEle(xml, tag string) (string, int, int) {
+	XML := Str(xml).T(BLANK)
+	PC(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Invalid XML"))
+
+	XML = Str(xml) //                                                   *** we have to return original position, so use original xml ***
+	s, sa := XML.Idx(fSf("<%s>", tag)), XML.Idx(fSf("<%s ", tag))
+	if s < 0 && sa >= 0 {
+		s = sa
+	} else if s >= 0 && sa < 0 {
+		// s = s
+	} else if s >= 0 && sa >= 0 {
+		min, _ := Min(I32s{s, sa}, "")
+		s = min.(int)
+	} else if s < 0 && sa < 0 {
+		return "", -1, -1
+	}
+
+	if eR := XML.S(s, ALL).Idx(fSf("</%s>", tag)); eR > 0 {
+		sNext := s + eR + Str(tag).L() + 3
+		return XML.S(s, sNext).V(), s, sNext
+	}
+
+	panic("Invalid XML")
+}
+
+// XMLTagEleEx : idx from 1
+func XMLTagEleEx(xml, tag string, idx int) string {
+	esum := 0
+	for i := 1; i <= idx; i++ {
+		XML := Str(xml).S(esum, ALL)
+		ele, _, e := XMLTagEle(XML.V(), tag)
+		if e == -1 {
+			return ""
+		}
+		if i == idx {
+			return ele
+		}
+		esum += e
+	}
+	panic("Should not be here!")
+}
+
+// XMLXPathEle :
+func XMLXPathEle(xml, xpath, del string, indices ...int) (ele string) {
+	PC(xpath == "", fEf("At least one path must be provided"))
+
+	segs := sSpl(xpath, del)
+	PC(len(segs) != len(indices), fEf("path & seg's index count not match"))
+
+	for i, seg := range segs {
+		xml = IF(ele != "", ele, xml).(string)
+		ele = XMLTagEleEx(xml, seg, indices[i])
+	}
+	return
+}
+
+// XMLAttributes is (ONLY LIKE  <SchoolInfo RefId="D3F5B90C-D85D-4728-8C6F-0D606070606C" Type="LGL">)
+func XMLAttributes(xmlele, attrPF string) (attributes, attriValues []string) { //  *** 'map' may cause mis-order, so use slice
+	XMLELE := Str(xmlele).T(BLANK)
+	PC(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Not a valid XML section"))
+
+	tag := Str(XMLTag(xmlele))
+	if eol := XMLELE.Idx(`">`) + 1; XMLELE.C(tag.L()+1) == ' ' && eol > tag.L() { //     *** has attributes
+		kvs := sFF(XMLELE.S(tag.L()+2, eol).V(), func(c rune) bool { return c == ' ' })
+		for _, kv := range kvs {
+			kvstrs := sFF(kv, func(c rune) bool { return c == '=' })
+			attributes = append(attributes, (attrPF + kvstrs[0])) //                     *** mark '-' before attribute for differentiating child
+			attriValues = append(attriValues, Str(kvstrs[1]).RmQuotes(QDouble).V())
+		}
+	}
+	return attributes, attriValues
+}
+
+// XMLChildren : (NOT search grandchildren)
+func XMLChildren(xmlele string) (children []string) {
+	XMLELE := Str(xmlele).T(BLANK)
+	PC(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Not a valid XML section"))
+
+	L := XMLELE.L()
+	skip, childpos, level, inflag := false, []int{}, 0, false
+
+	for i := 0; i < L; i++ {
+		c := XMLELE.C(i)
+
+		if c == '<' && XMLELE.S(i, i+4) == "<!--" {
+			skip = true
+		}
+		if c == '>' && XMLELE.S(i-2, i+1) == "-->" {
+			skip = false
+		}
+		if skip {
+			continue
+		}
+
+		if c == '<' && XMLELE.C(i+1) != '/' {
+			level++
+		}
+		if c == '<' && XMLELE.C(i+1) == '/' {
+			level--
+			if level == 1 {
+				inflag = false
+			}
+		}
+
+		if level == 2 {
+			if !inflag {
+				childpos, inflag = append(childpos, i+1), true
+			}
+		}
+	}
+
+	if len(childpos) == 0 {
+		return
+	}
+
+	for _, p := range childpos {
+		pe, peA := XMLELE.S(p, ALL).Idx(">"), XMLELE.S(p, ALL).Idx(" ")
+		pe = IF(peA > 0 && peA < pe, peA, pe).(int)
+		child := XMLELE.S(p, p+pe)
+		children = append(children, child.V())
+	}
+
+	children = IArrFoldRep(Strs(children), "[]").([]string)
+	return
+}
+
+// XMLFamilyTree : ******************************************************************************************
+func XMLFamilyTree(xml, fName, del string, mapFT *map[string][]string) {
+	XML := Str(xml).T(BLANK)
+	PC(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Not a valid XML section"))
+	PC(mapFT == nil, fEf("FamilyTree return map is not initialised !"))
+
+	fName = IF(fName == "", XMLTag(xml), fName).(string)
+
+	if children := XMLChildren(xml); len(children) > 0 {
+		// fPln(tag, children)
+
+		(*mapFT)[fName] = children //                           *** record path ***
+
+		for _, child := range children {
+			if Str(child).HP("[]") {
+				child = Str(child).S(2, ALL).V()
+			}
+			nextPath := Str(fName + del + child).T(del).V()
+			subxml := XMLTagEleEx(xml, child, 1)
+			XMLFamilyTree(subxml, nextPath, del, mapFT)
+		}
+	}
+}
+
 // XMLSegPos : level from 1, index from 1                                         &
 func XMLSegPos(s Str, level, index int) (tag, str string, left, right int) {
 	markS, markE1, markE2, markE3 := '<', '<', '/', '>'

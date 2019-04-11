@@ -13,6 +13,7 @@ type (
 	Str  = w.Str
 	Strs = w.Strs
 	C32s = w.C32s
+	I32s = w.I32s
 )
 
 const (
@@ -26,10 +27,14 @@ const (
 var (
 	IF = u.IF
 	PC = u.PanicOnCondition
+	PE = u.PanicOnError
 
 	GetMapKeys    = w.GetMapKeys
 	IArrSearchOne = w.IArrSearchOne
 	IArrEleIn     = w.IArrEleIn
+	IArrIsSameEle = w.IArrIsSameEle
+	IArrFoldRep   = w.IArrFoldRep
+	Min           = w.Min
 
 	sortByLess = sort.Sort
 
@@ -43,4 +48,5 @@ var (
 	sSpl = strings.Split
 	sJ   = strings.Join
 	sRep = strings.Replace
+	sFF  = strings.FieldsFunc
 )
