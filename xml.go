@@ -38,13 +38,16 @@ func XMLTagEleEx(xml, tag string, idx int) (string, int) {
 	const LIMIT = 4096
 	PC(idx > LIMIT || idx < 1, fEf("idx starts from 1, to %d", LIMIT))
 	esum, rst := 0, ""
-	for i := 1; i <= LIMIT; i++ { //                      *** set a limit for searching ***
+	for i := 1; i <= LIMIT; i++ { //              *** set a limit for searching ***
 		XML := Str(xml).S(esum, ALL)
-		ele, _, e := XMLTagEle(XML.V(), tag)
-		if e == -1 {
+		if XML.V() == "" { //                     *** to the end, return ***
 			return rst, i - 1
 		}
-		if i == idx {
+		ele, _, e := XMLTagEle(XML.V(), tag)
+		if e == -1 { //                           *** could not find, return ***
+			return rst, i - 1
+		}
+		if i == idx { //                          *** find, return ***
 			rst = ele
 		}
 		esum += e
@@ -136,7 +139,7 @@ func XMLChildren(xmlele string, fNArr bool) (children []string) {
 	return
 }
 
-// XMLFamilyTree : ******************************************************************************************
+// XMLFamilyTree :
 func XMLFamilyTree(xml, fName, del string, mapFT *map[string][]string) {
 	PC(mapFT == nil, fEf("FamilyTree return map is not initialised !"))
 	XML := Str(xml).T(BLANK)
@@ -191,18 +194,29 @@ func XMLArrByIPath(xml, iPath, del string, mapFT *map[string][]string) (arrNames
 
 	leaves := (*mapFT)[path]
 	for _, leaf := range leaves {
-		fPln(leaf)
+		// fPln(leaf)
 		LEAF := Str(leaf)
 		if LEAF.HP("[]") {
 			arrName := LEAF.S(2, ALL).V()
-			fPln(arrName)
+			// fPln(arrName)
 
-			// XMLXPathEle()
+			_, nArr := XMLXPathEle(xml, path+del+arrName, del, append(indices, 1)...)
+			// fPln(nArr)
 
+			arrNames = append(arrNames, arrName)
+			arrCnts = append(arrCnts, nArr)
+
+			for i := 1; i <= nArr; i++ {
+				nextIPath := iPath + del + arrName + fSf("#%d", i)
+				// fPln(nextIPath)
+				nextIPaths = append(nextIPaths, nextIPath)
+			}
 		}
 	}
 	return
 }
+
+
 
 /**********************************************************************************************************************************/
 
