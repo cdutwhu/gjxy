@@ -329,7 +329,9 @@ func JSONArrInfo(s, xpath, del, id string, mapFT *map[string][]string) (*map[str
 	// }
 	// sortByLess(Strs(keys))
 
-	ok, _, root := IArrSearchOne(Strs(keys), func(i int, a interface{}) (bool, interface{}) { return !sCtn(a.(string), del), a })
+	ok, _, root := IArrSearchOne(Strs(keys), func(i int, a interface{}) (bool, interface{}) {
+		return !Str(a.(string)).Contains(del) /*!sCtn(a.(string), del)*/, a
+	})
 	fPf("ROOT is <%s>\n", root)
 	PC(!ok, fEf("Invalid path"))
 
@@ -416,7 +418,8 @@ func JSONBuildIPathRep(mIPathObj map[string]string, del string) string {
 	K := ""
 	keys := GetMapKeys(mIPathObj).([]string)
 	for _, k := range keys {
-		if !sCtn(k, del) {
+		//if !sCtn(k, del) {
+		if !Str(k).Contains(del) {
 			K = k
 			break
 		}
@@ -430,7 +433,8 @@ AGAIN:
 				continue
 			}
 			old := Str(v).RmQuotes(QDouble).V()
-			if sCtn(old, k1) {
+			// if sCtn(old, k1) {
+			if Str(old).Contains(k1) {
 				mIPathObj[k] = sRep(v, "\""+k1+"\"", v1, -1)
 				goto AGAIN
 			}

@@ -4,7 +4,8 @@ package gjxy
 func SchemaBuild(s Str, typename, field, fieldtype string) (schema string) {
 	if ok, pos, _ := s.SearchStrsIgnore("type", typename, "{", " \t"); ok {
 		content, _, r := s[pos:].BracketsPos(BCurly, 1, 1)
-		if sCtn(content.V(), field+":") {
+		// if sCtn(content.V(), field+":") {
+		if content.Contains(field + ":") {
 			return s.V()
 		}
 		schema = s.V()[:pos+r]

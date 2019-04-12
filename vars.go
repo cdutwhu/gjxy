@@ -43,7 +43,7 @@ var (
 	fPln = fmt.Println
 	fPf  = fmt.Printf
 
-	sCtn = strings.Contains
+	// sCtn = strings.Contains
 	sCnt = strings.Count
 	sSpl = strings.Split
 	sJ   = strings.Join
