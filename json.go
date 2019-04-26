@@ -226,7 +226,7 @@ func JSONFamilyTree(s, fName, del string, mapFT *map[string][]string) {
 	}
 
 	if children := JSONObjChildren(s); len(children) > 0 {
-		fPln(fName, children) // DEBUG
+		// fPln(fName, children) // DEBUG
 
 		(*mapFT)[fName] = children //                        *** record path ***
 
@@ -321,7 +321,7 @@ func JSONArrInfo(s, xpath, del, id string, mapFT *map[string][]string) (*map[str
 		JSONFamilyTree(s, xpath, del, mapFT)
 	}
 
-	fPln(" ------------------------------------------------- ")
+	// fPln(" ------------------------------------------------- ")
 
 	keys := GetMapKeys(*mapFT).([]string)
 	// w.FunSortLess = func(a, b interface{}) bool { //                ** must directly touch package's function variable **
@@ -330,9 +330,9 @@ func JSONArrInfo(s, xpath, del, id string, mapFT *map[string][]string) (*map[str
 	// sortByLess(Strs(keys))
 
 	ok, _, root := IArrSearchOne(Strs(keys), func(i int, a interface{}) (bool, interface{}) {
-		return !Str(a.(string)).Contains(del) /*!sCtn(a.(string), del)*/, a
+		return !Str(a.(string)).Contains(del), a
 	})
-	fPf("ROOT is <%s>\n", root)
+	// fPf("ROOT is <%s>\n", root) //                                  *** DEBUG ***
 	PC(!ok, fEf("Invalid path"))
 
 	iRoot := root.(string) + "#1"
