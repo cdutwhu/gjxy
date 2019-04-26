@@ -21,10 +21,7 @@ func YAMLIsHangingLine(line string) bool {
 	check1 := !LINE.HP("- ")
 	check2 := !LINE.Contains(": ")
 	check3 := LINE.C(LAST) != ':'
-	if check1 && check2 && check3 {
-		return true
-	}
-	return false
+	return IF(check1 && check2 && check3, true, false).(bool)
 }
 
 // YAMLTag :
@@ -116,7 +113,7 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 		objGUID = ID
 	}
 
-	lvlPrev, lvlIdxPrev := lvl, make([]int, 64)	
+	lvlPrev, lvlIdxPrev := lvl, make([]int, 64)
 
 	// fPln(lvl)
 	// fPln(rst[0])
