@@ -228,7 +228,7 @@ func XMLCntInfo(xml, xpath, del, id string, mapFT *map[string][]string) (*map[st
 	// fPln(" ------------------------------------------ ")
 
 	root := XMLTag(xml)
-	fPf("ROOT is <%s>\n", root)
+	// fPf("ROOT is <%s>\n", root)
 	PC(root == "", fEf("Invalid path"))
 
 	iRoot := root + "#1"
@@ -243,7 +243,8 @@ func XMLCntInfo(xml, xpath, del, id string, mapFT *map[string][]string) (*map[st
 /**********************************************************************************************************************************/
 
 // XMLSegPos : level from 1, index from 1                                         &
-func XMLSegPos(s Str, level, index int) (tag, str string, left, right int) {
+func XMLSegPos(xml string, level, index int) (tag, str string, left, right int) {
+	s := Str(xml)
 	markS, markE1, markE2, markE3 := '<', '<', '/', '>'
 	curLevel, curIndex, To := 0, 0, s.L()-1
 
@@ -284,7 +285,8 @@ func XMLSegPos(s Str, level, index int) (tag, str string, left, right int) {
 }
 
 // XMLSegsCount : only count top level                                            &
-func XMLSegsCount(s Str) (count int) {
+func XMLSegsCount(xml string) (count int) {
+	s := Str(xml)
 	markS, markE1, markE2 := '<', '<', '/'
 
 	level, inflag, To := 0, false, s.L()-1

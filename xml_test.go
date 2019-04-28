@@ -19,7 +19,7 @@ func TestXML(t *testing.T) {
 	if str == "" {
 		return
 	}
-	fPln(" --------------------------------------- ")	
+	fPln(" --------------------------------------- ")
 
 	// mapFT := &map[string][]string{}
 	// XMLFamilyTree(str, "", " ~ ", mapFT)
@@ -33,35 +33,35 @@ func TestXML(t *testing.T) {
 	// fPln(" --------------------------------------- ")
 
 	mFT, mArr := XMLCntInfo(str, "", " ~ ", "ArrGUID", nil)
-	for k, v := range (*mFT) {
+	for k, v := range *mFT {
 		fPln(k, v)
 	}
 	fPln(" -------------------- ")
-	for k, v := range (*mArr) {
+	for k, v := range *mArr {
 		fPln(k, v)
 	}
 
-	return
+	// return
 
 	fPln(XMLAttributes(str, "-"))
-	fPln(" --------------------------------------- ")
+	fPln(" A --------------------------------------- ")
 
 	fPln(XMLChildren(str, true))
 	fPln(" --------------------------------------- ")
 
-	tag, xml, l, r := XMLSegPos(sif, 3, 1)
+	tag, xml, l, r := XMLSegPos(sif.V(), 3, 1)
 	fPln(tag)
 	fPln(xml)
 	fPln(l, r)
 
-	fPln(XMLSegsCount(sif))
+	fPln(XMLSegsCount(sif.V()))
 
 	fPln(" --------------------------------------- ")
 
-	tag, xml, l, r = XMLSegPos(sif, 1, 726)
+	tag, xml, l, r = XMLSegPos(sif.V(), 1, 726)
 	fPln(tag)
 	fPln(xml)
 	fPln(l, r)
 
-	fPln(XMLSegsCount(Str(xml)))
+	fPln(XMLSegsCount(xml))
 }
