@@ -1,6 +1,6 @@
 
 
-<SchoolInfo RefId="738F4DF5-949F-4380-8186-8252440A6F6F" test="hello">
+<SchoolInfo RefId="738F4DF5-949F-4380-8186-8252440A6F6F"   TestAttr="hello   world   test">
     <LocalId>01011234</LocalId>
     <StateProvinceId>01011234</StateProvinceId>
     <CommonwealthId>012345</CommonwealthId>

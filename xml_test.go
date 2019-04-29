@@ -14,7 +14,7 @@ func TestXML(t *testing.T) {
 	// fPln(str1, nArr)
 	// fPln(" --------------------------------------- ")
 
-	str, nArr := XMLXPathEle(sif.V(), "SchoolCourseInfo", " ~ ", 1)
+	str, nArr := XMLXPathEle(sif.V(), "SchoolInfo", " ~ ", 1)
 	fPln(str, nArr)
 	if str == "" {
 		return

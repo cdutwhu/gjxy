@@ -70,17 +70,35 @@ func XMLXPathEle(xml, xpath, del string, indices ...int) (ele string, nArr int) 
 }
 
 // XMLAttributes is (ONLY LIKE  <SchoolInfo RefId="D3F5B90C-D85D-4728-8C6F-0D606070606C" Type="LGL">)
-func XMLAttributes(xmlele, attrPF string) (attributes, attriValues []string) { //  *** 'map' may cause mis-order, so use slice
+func XMLAttributes(xmlele, attrPF string) (attributes, attriValues []string) { //       *** 'map' may cause mis-order, so use slice
 	XMLELE := Str(xmlele).T(BLANK)
 	PC(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Not a valid XML section"))
 
 	tag := Str(XMLTag(xmlele))
-	if eol := XMLELE.Idx(`">`) + 1; XMLELE.C(tag.L()+1) == ' ' && eol > tag.L() { //     *** has attributes
-		kvs := sFF(XMLELE.S(tag.L()+2, eol).V(), func(c rune) bool { return c == ' ' })
-		for _, kv := range kvs {
-			kvstrs := sFF(kv, func(c rune) bool { return c == '=' })
-			attributes = append(attributes, (attrPF + kvstrs[0])) //                     *** mark '-' before attribute for differentiating child
-			attriValues = append(attriValues, Str(kvstrs[1]).RmQuotes(QDouble).V())
+	if eol := XMLELE.Idx(`">`) + 1; XMLELE.C(tag.L()+1) == ' ' && eol > tag.L() { //    *** has attributes
+
+		focus := XMLELE.S(tag.L()+2, eol)
+		nAttri := sCnt(focus.V(), "=\"")
+		// fPln(nAttri)
+
+		for i := 1; i <= nAttri; i++ {
+			av, _, _ := focus.QuotesPos(QDouble, i)
+			attriValues = append(attriValues, av.RmQuotes(QDouble).V())
+		}
+
+	OUT:
+		for i := 1; i <= nAttri; i++ {
+			_, left, _ := focus.QuotesPos(QDouble, i)
+			for p := left - 2; p >= 0; p-- {
+				if p == 0 {
+					attributes = append(attributes, focus.S(0, left-1).V())
+					continue OUT
+				}
+				if focus.C(p) == ' ' {
+					attributes = append(attributes, focus.S(p+1, left-1).V())
+					continue OUT
+				}
+			}
 		}
 	}
 	return attributes, attriValues
