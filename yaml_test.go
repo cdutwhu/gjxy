@@ -34,6 +34,6 @@ func TestYAMLInfo(t *testing.T) {
 	PE(e)
 	info := YAMLInfo(string(bytes), "guid", " ~ ", true)
 	for _, item := range *info {
-		fPf("%s %-60s %s\n", item.ID, item.path, item.value)
+		fPf("%s %-60s %s\n", item.ID, item.Path, item.Value)
 	}
 }

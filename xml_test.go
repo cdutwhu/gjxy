@@ -36,12 +36,12 @@ func TestXML(t *testing.T) {
 	for k, v := range *mFT {
 		fPln(k, v)
 	}
-	fPln(" -------------------- ")
+	fPln("    -------------------- ")
 	for k, v := range *mArr {
 		fPln(k, v)
 	}
 
-	// return
+	return
 
 	fPln(XMLAttributes(str, "-"))
 	fPln(" A --------------------------------------- ")

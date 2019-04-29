@@ -90,17 +90,17 @@ func YAMLLineInfo(line, idmark, id string) (tag, value, ID string, level int, is
 
 // YAMLInfo :
 func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
-	// tag   string
-	path  string
-	value string
+	// Tag   string
+	Path  string
+	Value string
 	ID    string
 } {
 	lines := sFF(yaml, func(c rune) bool { return c == '\n' })
 	nLine := len(lines)
 	rst := make([]struct {
-		// tag   string
-		path  string
-		value string
+		// Tag   string
+		Path  string
+		Value string
 		ID    string
 	}, nLine)
 
@@ -108,7 +108,7 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 	objid := uuid.New().String()
 
 	tag, value, ID, lvl, _, IDByTxt := YAMLLineInfo(lines[0], idmark, objid)
-	rst[0].path, rst[0].value, rst[0].ID = tag, value, ID
+	rst[0].Path, rst[0].Value, rst[0].ID = tag, value, ID
 	if objGUID == "" && IDByTxt {
 		objGUID = ID
 	}
@@ -127,7 +127,7 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 		// }
 
 		_, value, ID, lvl, _, IDByTxt = YAMLLineInfo(l, idmark, objid)
-		rst[i].value, rst[i].ID = value, ID
+		rst[i].Value, rst[i].ID = value, ID
 		if objGUID == "" && IDByTxt {
 			objGUID = ID
 		}
@@ -136,12 +136,12 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 		copy(lvlIdx, lvlIdxPrev)
 
 		switch {
-		case lvl == lvlPrev+1: //                                         *** jump into ***
+		case lvl == lvlPrev+1: //                                     *** jump into ***
 			lvlIdx[lvl-1] = i - 1
-		case lvl == lvlPrev: //                                           *** next sibling ***
+		case lvl == lvlPrev: //                                       *** next sibling ***
 			// copy(levelIdx, levelIdxPrev)
-		case lvl == lvlPrev-1, lvl == lvlPrev-2, lvl == lvlPrev-3: //     *** jump out ***
-		default: //                                                       *** incorrect yaml ***
+		case lvl == lvlPrev-1, lvl == lvlPrev-2, lvl == lvlPrev-3: // *** jump out ***
+		default: //                                                   *** incorrect yaml ***
 		}
 		lvlIdx[lvl] = i
 
@@ -153,9 +153,9 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 			if tag == "" {
 				continue
 			}
-			rst[i].path += (tag + pathdel)
+			rst[i].Path += (tag + pathdel)
 		}
-		rst[i].path = Str(rst[i].path).RmTailFromLast(pathdel).V()
+		rst[i].Path = Str(rst[i].Path).RmTailFromLast(pathdel).V()
 
 		// fPln(lvl)
 		// fPln(rst[i])
@@ -167,9 +167,9 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 	//     *** clean up ID, & make onlyValues rst ***
 
 	rstOnlyHasV := []struct {
-		// tag   string
-		path  string
-		value string
+		// Tag   string
+		Path  string
+		Value string
 		ID    string
 	}{}
 
@@ -177,7 +177,7 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 		if objGUID != "" {
 			rst[i].ID = objGUID
 		}
-		if rst[i].value != "" {
+		if rst[i].Value != "" {
 			rstOnlyHasV = append(rstOnlyHasV, rst[i])
 		}
 	}
