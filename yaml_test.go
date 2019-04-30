@@ -30,10 +30,10 @@ func TestYAMLValue(t *testing.T) {
 }
 
 func TestYAMLInfo(t *testing.T) {
-	bytes, e := ioutil.ReadFile("./yaml/actor.yaml")
+	bytes, e := ioutil.ReadFile("./yaml/tempyaml.1.yaml")
 	PE(e)
 	info := YAMLInfo(string(bytes), "guid", " ~ ", true)
-	for _, item := range *info {
-		fPf("%s %-60s %s\n", item.ID, item.Path, item.Value)
+	for i, item := range *info {
+		fPf("%02d : %s %-70s %s\n", i, item.ID, item.Path, item.Value)
 	}
 }

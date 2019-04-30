@@ -62,9 +62,17 @@ func YAMLValue(line string) (value string, isArr bool) {
 func YAMLLevel(line string) int {
 	LINE := Str(line)
 	nLine := LINE.L()
-	if nLine == 3 && LINE.HP("- ") {
+	
+	if LINE.HP("- ") && !LINE.HS(":") {
 		return 1
 	}
+	if LINE.HP("  - ") && !LINE.HS(":") {
+		return 2
+	}
+	if LINE.HP("    - ") && !LINE.HS(":") {
+		return 3
+	}
+	
 	for i := 0; i < nLine-1; i++ {
 		c, cn := LINE.C(i), LINE.C(i+1)
 		if c != ' ' && cn != ' ' {
@@ -124,9 +132,10 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 		i++
 		objid = IF(IDByTxt, ID, objid).(string)
 
-		// if i == 4 {
-		// 	fPln("break")
-		// }
+		// fPln(i)
+		if i == 93 {
+			fPln("break")
+		}
 
 		_, value, ID, lvl, _, IDByTxt = YAMLLineInfo(l, idmark, objid)
 		rst[i].Value, rst[i].ID = value, ID
