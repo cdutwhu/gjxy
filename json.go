@@ -216,7 +216,7 @@ func JSONObjChildren(s string) (children []string) {
 	return
 }
 
-// JSONFamilyTree : Use One Sample to get FamilyTree, DO NOT use long array data                                   &
+// JSONFamilyTree : Use One Sample to get FamilyTree, DO NOT use long array data                             &
 func JSONFamilyTree(s, fName, del string, mapFT *map[string][]string) {
 	PC(mapFT == nil, fEf("FamilyTree return map is not initialised !"))
 	// fPln(fName) // DEBUG

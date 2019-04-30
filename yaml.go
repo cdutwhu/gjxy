@@ -82,8 +82,10 @@ func YAMLLineInfo(line, idmark, id string) (tag, value, ID string, level int, is
 	level = YAMLLevel(line)
 	ID, IDByTxt = id, false
 	if LINE.HP(idmark+": ") || LINE.Contains(" "+idmark+": ") || LINE.Contains(" -"+idmark+": ") {
-		PC(!Str(value).IsUUID(), fEf("%s is not a valid UUID", value))
-		ID, IDByTxt = value, true
+		// PC(!Str(value).IsUUID(), fEf("%s is not a valid UUID", value))
+		if Str(value).IsUUID() {
+			ID, IDByTxt = value, true
+		}
 	}
 	return
 }
