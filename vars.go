@@ -25,9 +25,12 @@ const (
 )
 
 var (
-	IF = u.IF
-	PC = u.PanicOnCondition
-	PE = u.PanicOnError
+	IF   = u.IF
+	PC   = u.PanicOnCondition
+	PE   = u.PanicOnError
+	PE1  = u.PanicOnError1
+	PH   = u.PanicHandle
+	Must = u.Must
 
 	GetMapKeys    = w.GetMapKeys
 	IArrSearchOne = w.IArrSearchOne
@@ -43,7 +46,6 @@ var (
 	fPln = fmt.Println
 	fPf  = fmt.Printf
 
-	// sCtn = strings.Contains
 	sCnt = strings.Count
 	sSpl = strings.Split
 	sJ   = strings.Join
