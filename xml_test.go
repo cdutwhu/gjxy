@@ -10,9 +10,11 @@ func TestXML(t *testing.T) {
 	sif := Str(sifbytes)
 	sif.SetEnC()
 
-	// str1, nArr := XMLTagEleEx(sif.V(), "CourseTitle", 3)
-	// fPln(str1, nArr)
-	// fPln(" --------------------------------------- ")
+	tag := XMLTag(sif.V())
+	fPln(tag)
+	fPln(" --------------------------------------- ")
+
+	return
 
 	str, nArr := XMLXPathEle(sif.V(), "SchoolInfo", " ~ ", 1)
 	fPln(str, nArr)

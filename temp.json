@@ -27,7 +27,11 @@
                     "HELLO SUB WORLD D"
                 ],
                 "SUB FNAME": "SUB WORLD",
-                "SUB GNAME": "SUB HELLO"
+                "SUB GNAME": "SUB HELLO",
+                "SUB GNAME 1": [
+                    true,
+                    false
+                ]
             }
         }
     ],

@@ -105,16 +105,17 @@ func TestJSONMake(t *testing.T) {
 
 	mIPathObj := map[string]string{}
 
-	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "name", "hello world")
-	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "fname", "world")
-	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "gname", "hello")
 	JSONBuildIPath(mIPathObj, "ROOT", "StaffPersonal", "ROOT.StaffPersonal#1")
-	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "NAME", "HELLO WORLD")
-	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "FNAME", "WORLD")
-	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "GNAME", "HELLO")
 	JSONBuildIPath(mIPathObj, "ROOT", "StaffPersonal", "ROOT.StaffPersonal#2")
 	JSONBuildIPath(mIPathObj, "ROOT", "NAME", "HELLO ROOT")
 	JSONBuildIPath(mIPathObj, "ROOT", "GNAME", "HELLO")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "name", "hello world")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "fname", "world")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "gname", "hello")	
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "NAME", "HELLO WORLD")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "FNAME", "WORLD")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "GNAME", "HELLO")
+
 	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1.SubTest", "sub name", "hello sub world")
 	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1.SubTest", "sub fname", "sub world")
 	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#1", "test", "ROOT.StaffPersonal#1.SubTest")
@@ -129,11 +130,14 @@ func TestJSONMake(t *testing.T) {
 	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB FNAME", "SUB WORLD")
 	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2", "test", "ROOT.StaffPersonal#2.SubTest")
 	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB GNAME", "SUB HELLO")
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB GNAME 1", true)
+	JSONBuildIPath(mIPathObj, "ROOT.StaffPersonal#2.SubTest", "SUB GNAME 1", false)
 
 	//fPln(mIPathObj["ROOT"])
 	//fPln("ROOT.StaffPersonal", mIPathObj["ROOT.StaffPersonal"])
 
 	root := JSONBuildIPathRep(mIPathObj, ".")
+	ioutil.WriteFile("temp.json", []byte(root), 0666)
 
 	// mIPathStr["ROOT#1.StaffPersonal"] = JSONBuildObj("", "ROOT#1.StaffPersonal", "name", "hello", false)
 	// fPln("11", mIPathStr["ROOT#1.StaffPersonal"])
@@ -148,42 +152,7 @@ func TestJSONMake(t *testing.T) {
 	// fPln("1", root)
 
 	// root, ok = JSONBuildObj(root, "root", "StaffPersonal", StaffPersonal, true)
-	// fPln("1", root, ok)
-
-	// // //json, ok = Str(json).JSONBuild("StaffPersonal", ".", 1, "-RefId", "{}")
-	// json, ok = JSONBuild(Str(json), "StaffPersonal#1", ".", "LocalId", "946379881")
-	// json, ok = JSONBuild(Str(json), "StaffPersonal#1", ".", "LocalId", "946379882")
-	// json, ok = JSONBuild(Str(json), "StaffPersonal#1", ".", "LocalIdTest", "tttttttt")
-	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "StateProvinceId", "C2345681", 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "OtherIdList", "{}", 1)            //                                ***
-	// json, ok = Str(json).JSONBuild("StaffPersonal.OtherIdList", ".", "OtherId", "{}", 1, 1) //                     *** 1
-	// json, ok = Str(json).JSONBuild("StaffPersonal.OtherIdList.OtherId", ".", "-Type", "0004", 1, 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.OtherIdList.OtherId", ".", "#content", "333333333", 1, 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "PersonInfo", "{}", 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo", ".", "Name", "{}", 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo.Name", ".", "-Type", "LGL", 1, 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo", ".", "OtherNames", "{}", 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo.OtherNames", ".", "Name", "[{},{}]", 1, 1, 1) //      ***
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo.OtherNames.Name", ".", "-Type", "AKA", 1, 1, 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo.OtherNames.Name", ".", "-Type", "PRF", 1, 1, 1, 2) // ***
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo", ".", "Demographics", "{}", 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo.Demographics", ".", "CountriesOfCitizenship", "{}", 1, 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo.Demographics.CountriesOfCitizenship", ".", "CountryOfCitizenship", "\"8104\"", 1, 1, 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo.Demographics.CountriesOfCitizenship", ".", "CountryOfCitizenship", "\"1101\"", 1, 1, 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "LocalId", "946379883", 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "LocalIdTest", "iiiiiiii", 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.PersonInfo.Demographics.CountriesOfCitizenship", ".", "CountryOfCitizenship", "\"2202\"", 1, 1, 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.OtherIdList", ".", "OtherId", "{}", 1, 1) //                     *** 2
-	// json, ok = Str(json).JSONBuild("StaffPersonal.OtherIdList.OtherId", ".", "-Type", "0005", 1, 1, 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.OtherIdList.OtherId", ".", "-Type1", "0008", 1, 1, 2)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.OtherIdList.OtherId", ".", "#content", "44444444", 1, 1, 2)
-	// // // json, ok = Str(json).JSONBuild("StaffPersonal", ".", 1, "LocalId", "{}")
-	// json, ok = Str(json).JSONBuild("StaffPersonal", ".", "LocalId", "test2", 1)
-	// json, ok = Str(json).JSONBuild("StaffPersonal.OtherIdList.OtherId", ".", "#content", "44444444", 1, 1, 2)
-	// // // // fPln(Str(json).JSONXPath("StaffPersonal.PersonInfo.OtherNames.Name", ".", 1))
-
-	// fPln(json, ok)
-	ioutil.WriteFile("temp.json", []byte(root), 0666)
+	// fPln("1", root, ok)	
 }
 
 func TestJSONObjectMerge(t *testing.T) {

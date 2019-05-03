@@ -120,26 +120,21 @@ AGAIN:
 		sBelow := Str(s).S(start, ALL, L)
 		if sCnt(above, "{")-sCnt(above, "}") == 1 { // *** TRUELY FOUND ( Object OR Value ) ***
 			if ok, s, _ := sBelow.SearchStrsIgnore(":", "{", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //         *** object ***
-
 				str, _, _ := sBelow.BracketsPos(BCurly, 1, 1)
 				content, cType = str.V(), JT_OBJ
-
 			} else if ok, s, _ := sBelow.SearchStrsIgnore(":", "[", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //  *** array ***
-
 				str, _, _ := sBelow.BracketsPos(BBox, 1, 1)
 				content, cType = str.V(), JT_ARR
-
 			} else if ok, s, _ := sBelow.SearchStrsIgnore(":", "\"", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** string ***
-
 				str, _, _ := sBelow.QuotesPos(QDouble, 2)
 				//content, cType = str.RmQuotes(QDouble).V(), JT_STR
 				content, cType = str.V(), JT_STR //                      ** keep string value's quotations **
-
 			} else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, DigStrArr, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** number ***
-
 				_, value := sBelow.KeyValuePair(":", BLANK+",{", BLANK+",}", true, true)
 				content, cType = value.V(), JT_NUM
-
+			} else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, []string{"true", "false"}, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** bool ***
+				_, value := sBelow.KeyValuePair(":", BLANK+",{", BLANK+",}", true, true)
+				content, cType = value.V(), JT_BOOL
 			} else {
 				panic("not implemented")
 			}
@@ -433,7 +428,6 @@ AGAIN:
 				continue
 			}
 			old := Str(v).RmQuotes(QDouble).V()
-			// if sCtn(old, k1) {
 			if Str(old).Contains(k1) {
 				mIPathObj[k] = sRep(v, "\""+k1+"\"", v1, -1)
 				goto AGAIN
