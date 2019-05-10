@@ -340,7 +340,7 @@ func JSONArrInfo(s, xpath, del, id string, mapFT *map[string][]string) (*map[str
 }
 
 // JSONBuildObj :
-func JSONBuildObj(s, obj, property string, value interface{}, overwrite bool) string {
+func JSONBuildObj(s, obj, property string, value interface{}, overwrite, mustArr bool) string {
 	defer func() { mapJBPos[obj] = Str(s).L() - 1 }()
 
 	property = Str(property).MkQuotes(QDouble).V()
@@ -354,7 +354,7 @@ func JSONBuildObj(s, obj, property string, value interface{}, overwrite bool) st
 
 	s = IF(Str(s).T(BLANK) == "", "{}", s).(string)
 	if s == "{}" { //                                                     *** first element ***
-		s = fSf(`{%s: %v}`, property, value)
+		s = fSf(IF(mustArr, `{%s: [%v]}`, `{%s: %v}`).(string), property, value)
 		mapJBKids[obj] = append(mapJBKids[obj], property)
 		return s
 	}
@@ -387,7 +387,7 @@ func JSONBuildObj(s, obj, property string, value interface{}, overwrite bool) st
 		}
 
 		//                                                                *** new property ***
-		seg := fSf(`, %s: %v}`, property, value)
+		seg := fSf(IF(mustArr, `, %s: [%v]}`, `, %s: %v}`).(string), property, value)
 		s = Str(s).SegRep(start, start+1, seg).V()
 		mapJBKids[obj] = append(mapJBKids[obj], property)
 		return s
@@ -397,12 +397,12 @@ func JSONBuildObj(s, obj, property string, value interface{}, overwrite bool) st
 }
 
 // JSONBuildIPath :
-func JSONBuildIPath(mIPathObj map[string]string, iPath, property string, value interface{}) string {
+func JSONBuildIPath(mIPathObj map[string]string, iPath, property string, value interface{}, mustArr bool) string {
 	PC(mIPathObj == nil, fEf("mIPathObj is nil"))
 	if content, ok := mIPathObj[iPath]; ok {
-		mIPathObj[iPath] = JSONBuildObj(content, iPath, property, value, false)
+		mIPathObj[iPath] = JSONBuildObj(content, iPath, property, value, false, mustArr)
 	} else {
-		mIPathObj[iPath] = JSONBuildObj("", iPath, property, value, false)
+		mIPathObj[iPath] = JSONBuildObj("", iPath, property, value, false, mustArr)
 	}
 	PC(!IsJSON(mIPathObj[iPath]), fEf("<%s>: <%s> is not valid JSON string", iPath, mIPathObj[iPath]))
 	return mIPathObj[iPath]
@@ -413,7 +413,6 @@ func JSONBuildIPathRep(mIPathObj map[string]string, del string) string {
 	K := ""
 	keys := GetMapKeys(mIPathObj).([]string)
 	for _, k := range keys {
-		//if !sCtn(k, del) {
 		if !Str(k).Contains(del) {
 			K = k
 			break

@@ -16,25 +16,19 @@
             }
         },
         {
-            "NAME": "HELLO WORLD",
+            "NAME": [
+                "HELLO WORLD"
+            ],
             "FNAME": "WORLD",
-            "GNAME": "HELLO",
-            "test": {
-                "SUB NAME": [
-                    "HELLO SUB WORLD A",
-                    "HELLO SUB WORLD B",
-                    "HELLO SUB WORLD C",
-                    "HELLO SUB WORLD D"
-                ],
-                "SUB FNAME": "SUB WORLD",
-                "SUB GNAME": "SUB HELLO",
-                "SUB GNAME 1": [
-                    true,
-                    false
-                ]
-            }
+            "GNAME": "HELLO"
         }
     ],
-    "NAME": "HELLO ROOT",
-    "GNAME": "HELLO"
+    "NAME": [
+        "HELLO ROOT"
+    ],
+    "GNAME": [
+        "HELLO",
+        "WORLD 1",
+        "WORLD 2"
+    ]
 }
