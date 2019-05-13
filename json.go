@@ -339,8 +339,8 @@ func JSONArrInfo(s, xpath, del, id string, mapFT *map[string][]string) (*map[str
 	return mapFT, mapIPathNID
 }
 
-// JSONBuildObj :
-func JSONBuildObj(s, obj, property string, value interface{}, overwrite, mustArr bool) string {
+// JSONMakeObj :
+func JSONMakeObj(s, obj, property string, value interface{}, overwrite, mustArr bool) string {
 	defer func() { mapJBPos[obj] = Str(s).L() - 1 }()
 
 	property = Str(property).MkQuotes(QDouble).V()
@@ -396,20 +396,20 @@ func JSONBuildObj(s, obj, property string, value interface{}, overwrite, mustArr
 	return s
 }
 
-// JSONBuildIPath :
-func JSONBuildIPath(mIPathObj map[string]string, iPath, property string, value interface{}, mustArr bool) string {
+// JSONMakeIPath :
+func JSONMakeIPath(mIPathObj map[string]string, iPath, property string, value interface{}, mustArr bool) string {
 	PC(mIPathObj == nil, fEf("mIPathObj is nil"))
 	if content, ok := mIPathObj[iPath]; ok {
-		mIPathObj[iPath] = JSONBuildObj(content, iPath, property, value, false, mustArr)
+		mIPathObj[iPath] = JSONMakeObj(content, iPath, property, value, false, mustArr)
 	} else {
-		mIPathObj[iPath] = JSONBuildObj("", iPath, property, value, false, mustArr)
+		mIPathObj[iPath] = JSONMakeObj("", iPath, property, value, false, mustArr)
 	}
 	PC(!IsJSON(mIPathObj[iPath]), fEf("<%s>: <%s> is not valid JSON string", iPath, mIPathObj[iPath]))
 	return mIPathObj[iPath]
 }
 
-// JSONBuildIPathRep :
-func JSONBuildIPathRep(mIPathObj map[string]string, del string) string {
+// JSONMakeIPathRep :
+func JSONMakeIPathRep(mIPathObj map[string]string, del string) string {
 	K := ""
 	keys := GetMapKeys(mIPathObj).([]string)
 	for _, k := range keys {
@@ -437,14 +437,14 @@ AGAIN:
 	return mIPathObj[K]
 }
 
-// // JSONBuild :
-// func JSONBuild(s, iPath, del, property string, value interface{}) (string, bool) {
+// // JSONMake :
+// func JSONMake(s, iPath, del, property string, value interface{}) (string, bool) {
 // 	path, indices := IPathToPathIndices(iPath, del)
 // 	ss := sSpl(path, del)
 // 	exPath, obj := sJ(ss[:len(ss)-1], del), ss[len(ss)-1]
 // 	content, _ := JSONXPathValue(s, path, del, indices...)
-// 	objstr, ok := JSONBuildObj(content, obj, property, value, false)
-// 	root, ok := JSONBuildObj(s, exPath, obj, objstr, true)
+// 	objstr, ok := JSONMakeObj(content, obj, property, value, false)
+// 	root, ok := JSONMakeObj(s, exPath, obj, objstr, true)
 // 	return root, ok
 // }
 
