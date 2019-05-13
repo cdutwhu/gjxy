@@ -27,7 +27,7 @@ type OtherId {
 	-Type: String
 }`)
 
-	s = Str(SchemaBuild(s, "OtherIdList2", "OtherId2", "String"))
+	s = Str(SchemaMake(s, "OtherIdList2", "OtherId2", "String"))
 
 	// s := Str("")
 	// s = Str(s.GQLBuild("StaffPersonal", "RefId", "String"))

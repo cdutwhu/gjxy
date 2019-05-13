@@ -41,10 +41,10 @@ func TestYAMLInfo(t *testing.T) {
 func TestGetSplittedLines(t *testing.T) {
 	bytes, e := ioutil.ReadFile("./yaml/test.yaml")
 	PE(e)
-	rst1, rst2 := GetSplittedLines(string(bytes))
+	rst1, rst2 := YAMLGetSplittedLines(string(bytes))
 	fPln(rst1)
 	fPln(rst2)
-	newyaml := JoinSplittedLines(string(bytes))
+	newyaml := YAMLJoinSplittedLines(string(bytes))
 	fPln(newyaml)
 	ioutil.WriteFile("./yaml/test1.yaml", []byte(newyaml), 0666)
 }

@@ -1,10 +1,9 @@
 package gjxy
 
-// SchemaBuild : ignore identical field
-func SchemaBuild(s Str, typename, field, fieldtype string) (schema string) {
+// SchemaMake : ignore identical field
+func SchemaMake(s Str, typename, field, fieldtype string) (schema string) {
 	if ok, pos, _ := s.SearchStrsIgnore("type", typename, "{", " \t"); ok {
-		content, _, r := s[pos:].BracketsPos(BCurly, 1, 1)
-		// if sCtn(content.V(), field+":") {
+		content, _, r := s[pos:].BracketsPos(BCurly, 1, 1)		
 		if content.Contains(field + ":") {
 			return s.V()
 		}
