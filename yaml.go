@@ -62,7 +62,7 @@ func YAMLValue(line string) (value string, isArr bool) {
 func YAMLLevel(line string) int {
 	LINE := Str(line)
 	nLine := LINE.L()
-	
+
 	if LINE.HP("- ") && !LINE.HS(":") {
 		return 1
 	}
@@ -75,7 +75,7 @@ func YAMLLevel(line string) int {
 	if LINE.HP("      - ") && !LINE.HS(":") {
 		return 4
 	}
-	
+
 	for i := 0; i < nLine-1; i++ {
 		c, cn := LINE.C(i), LINE.C(i+1)
 		if c != ' ' && cn != ' ' {
@@ -202,4 +202,37 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 		return &rstOnlyHasV
 	}
 	return &rst
+}
+
+// GetSplittedLines : iLns : HangingLines List; mBelongto : HangingLine's first value line
+func GetSplittedLines(yaml string) (iLns []int, mBelongto map[int]int) {
+	mBelongto = make(map[int]int)
+	lines := sFF(yaml, func(c rune) bool { return c == '\n' })
+	for i, line := range lines {
+		if YAMLIsHangingLine(line) {
+			iLns = append(iLns, i)
+			for j := i - 1; j >= 0; j-- {
+				if !YAMLIsHangingLine(lines[j]) {
+					mBelongto[i] = j
+					break
+				}
+			}
+		}
+	}
+	return
+}
+
+// JoinSplittedLines :
+func JoinSplittedLines(yaml string) string {
+	iLines, _ := GetSplittedLines(yaml)
+	lines := sFF(yaml, func(c rune) bool { return c == '\n' })
+	newLines := []string{}
+	for i, line := range lines {
+		if IArrEleIn(i, I32s(iLines)) {
+			newLines[len(newLines)-1] += " " + Str(line).T(BLANK).V()
+		} else {
+			newLines = append(newLines, line)
+		}
+	}
+	return sJ(newLines, "\n") + "\n"
 }
