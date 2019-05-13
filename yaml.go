@@ -204,8 +204,8 @@ func YAMLInfo(yaml, idmark, pathdel string, onlyValues bool) *[]struct {
 	return &rst
 }
 
-// GetSplittedLines : iLns : HangingLines List; mBelongto : HangingLine's first value line
-func GetSplittedLines(yaml string) (iLns []int, mBelongto map[int]int) {
+// YAMLGetSplittedLines : iLns : HangingLines List; mBelongto : HangingLine's first value line
+func YAMLGetSplittedLines(yaml string) (iLns []int, mBelongto map[int]int) {
 	mBelongto = make(map[int]int)
 	lines := sFF(yaml, func(c rune) bool { return c == '\n' })
 	for i, line := range lines {
@@ -222,9 +222,9 @@ func GetSplittedLines(yaml string) (iLns []int, mBelongto map[int]int) {
 	return
 }
 
-// JoinSplittedLines :
-func JoinSplittedLines(yaml string) string {
-	iLines, _ := GetSplittedLines(yaml)
+// YAMLJoinSplittedLines :
+func YAMLJoinSplittedLines(yaml string) string {
+	iLines, _ := YAMLGetSplittedLines(yaml)
 	lines := sFF(yaml, func(c rune) bool { return c == '\n' })
 	newLines := []string{}
 	for i, line := range lines {
