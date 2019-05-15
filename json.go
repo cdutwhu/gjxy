@@ -1,6 +1,9 @@
 package gjxy
 
-import "encoding/json"
+import (
+	"sort"
+	"encoding/json"
+)
 
 // IsJSON :                                                                                     &
 func IsJSON(s string) bool {
@@ -410,31 +413,43 @@ func JSONMakeIPath(mIPathObj map[string]string, iPath, property string, value in
 
 // JSONMakeIPathRep :
 func JSONMakeIPathRep(mIPathObj map[string]string, del string) string {
-	K := ""
-	keys := GetMapKeys(mIPathObj).([]string)
+	RootKey, keys := "", GetMapKeys(mIPathObj).([]string)
 	for _, k := range keys {
 		if !Str(k).Contains(del) {
-			K = k
+			RootKey = k
 			break
 		}
 	}
-	PC(K == "", fEf("ROOT error"))
+	PC(RootKey == "", fEf("ROOT error"))
 
-AGAIN:
-	for k, v := range mIPathObj {
-		for k1, v1 := range mIPathObj {
-			if k == k1 {
-				continue
-			}
-			old := Str(v).RmQuotes(QDouble).V()
-			if Str(old).Contains(k1) {
-				mIPathObj[k] = sRep(v, "\""+k1+"\"", v1, -1)
-				goto AGAIN
+	sort.SliceStable(keys, func(i, j int) bool {
+		return sCnt(keys[i], del) > sCnt(keys[j], del)
+	})
+	for _, repKey := range keys {		
+		for k, v := range mIPathObj {
+			if Str(v).Contains(repKey) {
+				if repValue, ok := mIPathObj[repKey]; ok {
+					mIPathObj[k] = sRep(v, "\""+repKey+"\"", repValue, -1)
+				}
 			}
 		}
 	}
 
-	return mIPathObj[K]
+	// AGAIN:
+	// 	for k, v := range mIPathObj {
+	// 		for k1, v1 := range mIPathObj {
+	// 			if k == k1 {
+	// 				continue
+	// 			}
+	// 			old := Str(v).RmQuotes(QDouble).V()
+	// 			if Str(old).Contains(k1) {
+	// 				mIPathObj[k] = sRep(v, "\""+k1+"\"", v1, -1)
+	// 				goto AGAIN
+	// 			}
+	// 		}
+	// 	}
+
+	return mIPathObj[RootKey]
 }
 
 // // JSONMake :
