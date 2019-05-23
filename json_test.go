@@ -7,13 +7,13 @@ import (
 
 func TestJSONChild(t *testing.T) {
 
-	jsonBytes, _ := ioutil.ReadFile("./json/content.json") // only LF at end of line
+	jsonBytes, _ := ioutil.ReadFile("./json/sample.json") // only LF at end of line
 	s := Str(jsonBytes)
 	s.SetEnC()
 
 	{
-		fPln(JSONXPathValue(s.V(), "abc ~ subject", " ~ ", 1, 1))
-		fPln(JSONXPathValue(s.V(), "subject", " ~ ", 1))
+		// fPln(JSONXPathValue(s.V(), "abc ~ subject", " ~ ", 1, 1))
+		// fPln(JSONXPathValue(s.V(), "subject", " ~ ", 1))
 
 		// mapFT := &map[string][]string{}
 		// JSONFamilyTree(s, "xapi", " ~ ", mapFT)
@@ -21,16 +21,18 @@ func TestJSONChild(t *testing.T) {
 
 		fPln(" ----------------------------------------------- ")
 
-		mapFT, mapArrInfo := JSONArrInfo(s.V(), "xapi", " ~ ", "GUID", nil)
-		for k, v := range *mapFT {
+		mFT, mArrInfo := JSONArrInfo(s.V(), "xapi", " ~ ", "GUID", nil)
+		for k, v := range *mFT {
 			fPln(k, v)
 		}
 
 		fPln(" ----------------------------------------------- ")
 
-		for k, v := range *mapArrInfo {
+		for k, v := range *mArrInfo {
 			fPln(k, v)
 		}
+
+		fPln(" ----------------------------------------------- ")
 	}
 
 	jsonSample := ` [ 1, "a", 123, ["ab"], true, false, true, null, null ] `

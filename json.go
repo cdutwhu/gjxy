@@ -1,8 +1,8 @@
 package gjxy
 
 import (
-	"sort"
 	"encoding/json"
+	"sort"
 )
 
 // IsJSON :                                                                                     &
@@ -292,22 +292,38 @@ func JSONWholeArrByIPathByR(s, iPath, del, id string, mFT *map[string][]string, 
 	ID    string
 }) {
 
-	PC(mIPathNID == nil, fEf("result mapIPathNID is not initialized"))
+	PC(mIPathNID == nil, fEf("result mIPathNID is not initialized"))
 	arrNames, arrCnts, subIPaths := JSONArrByIPath(s, iPath, del, mFT)
 	PC(len(arrNames) != len(arrCnts), fEf("error in JSONArrByIPath"))
 
-	nNames := len(arrNames)
-	for i := 0; i < nNames; i++ {
-		(*mIPathNID)[iPath+del+arrNames[i]] = struct {
-			Count int
-			ID    string
-		}{
-			Count: arrCnts[i],
-			ID:    id,
+	if len(arrNames) == 0 { //  *** iPath is not array, BUT maybe has children, make new iPaths, then recursive ***
+
+		// fPln(iPath, "no array child")
+		r1, _ := Str(iPath).SplitEx(del, "#", "string", "int")
+		path := sJ(r1.([]string), del)
+		// fPln(path)
+		for _, child := range (*mFT)[path] {
+			subIPath := iPath + del + child + "#1"
+			// fPln("DO MORE THINGS:", subIPath)
+			JSONWholeArrByIPathByR(s, subIPath, del, id, mFT, mIPathNID)
 		}
-	}
-	for _, subIPath := range subIPaths {
-		JSONWholeArrByIPathByR(s, subIPath, del, id, mFT, mIPathNID)
+
+	} else {
+
+		nNames := len(arrNames)
+		for i := 0; i < nNames; i++ {
+			(*mIPathNID)[iPath+del+arrNames[i]] = struct {
+				Count int
+				ID    string
+			}{
+				Count: arrCnts[i],
+				ID:    id,
+			}
+		}
+		for _, subIPath := range subIPaths {
+			JSONWholeArrByIPathByR(s, subIPath, del, id, mFT, mIPathNID)
+		}
+
 	}
 }
 
@@ -429,7 +445,7 @@ func JSONMakeIPathRep(mIPathObj map[string]string, del string) string {
 	sort.SliceStable(keys, func(i, j int) bool {
 		return sCnt(keys[i], del) > sCnt(keys[j], del)
 	})
-	for _, repKey := range keys {		
+	for _, repKey := range keys {
 		for k, v := range mIPathObj {
 			if Str(v).Contains(repKey) {
 				if repValue, ok := mIPathObj[repKey]; ok {
