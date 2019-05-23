@@ -7,7 +7,7 @@ import (
 
 func TestJSONChild(t *testing.T) {
 
-	jsonBytes, _ := ioutil.ReadFile("./json/sample.json") // only LF at end of line
+	jsonBytes, _ := ioutil.ReadFile("./json/content.json") // only LF at end of line
 	s := Str(jsonBytes)
 	s.SetEnC()
 
@@ -19,9 +19,11 @@ func TestJSONChild(t *testing.T) {
 		// JSONFamilyTree(s, "xapi", " ~ ", mapFT)
 		// fPln(mapFT)
 
+		_, _, json := JSONWrapRoot(s.V(), "xapi")
+
 		fPln(" ----------------------------------------------- ")
 
-		mFT, mArrInfo := JSONArrInfo(s.V(), "xapi", " ~ ", "GUID", nil)
+		mFT, mArrInfo := JSONArrInfo(json, "", " ~ ", "GUID", nil)
 		for k, v := range *mFT {
 			fPln(k, v)
 		}

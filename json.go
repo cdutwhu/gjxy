@@ -337,6 +337,8 @@ func JSONArrInfo(s, xpath, del, id string, mFT *map[string][]string) (*map[strin
 		JSONFamilyTree(s, xpath, del, mFT)
 	}
 
+	delete(*mFT, "")
+
 	// fPln(" ------------------------------------------------- ")
 
 	keys := GetMapKeys(*mFT).([]string)
