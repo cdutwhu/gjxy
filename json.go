@@ -215,8 +215,8 @@ func JSONObjChildren(s string) (children []string) {
 }
 
 // JSONFamilyTree : Use One Sample to get FamilyTree, DO NOT use long array data                             &
-func JSONFamilyTree(s, fName, del string, mapFT *map[string][]string) {
-	PC(mapFT == nil, fEf("FamilyTree return map is not initialised !"))
+func JSONFamilyTree(s, fName, del string, mFT *map[string][]string) {
+	PC(mFT == nil, fEf("FamilyTree return map is not initialised !"))
 	// fPln(fName) // DEBUG
 
 	if Str(s).T(BLANK).C(0) != '{' && Str(s).T(BLANK).C(LAST) != '}' {
@@ -226,7 +226,7 @@ func JSONFamilyTree(s, fName, del string, mapFT *map[string][]string) {
 	if children := JSONObjChildren(s); len(children) > 0 {
 		// fPln(fName, children) // DEBUG
 
-		(*mapFT)[fName] = children //                        *** record path ***
+		(*mFT)[fName] = children //                          *** record path ***
 
 		for _, child := range children {
 			if Str(child).HP("[") {
@@ -239,10 +239,12 @@ func JSONFamilyTree(s, fName, del string, mapFT *map[string][]string) {
 			}
 
 			content, _ := JSONXPathValue(s, nextPath, del, indices...)
-			JSONFamilyTree(content, nextPath, del, mapFT)
+			JSONFamilyTree(content, nextPath, del, mFT)
 		}
 	}
 }
+
+// --------------------------------------------------------------------------------------------- //
 
 // IPathToPathIndices :
 func IPathToPathIndices(iPath, del string) (string, []int) {
@@ -258,10 +260,10 @@ func IPathToPathIndices(iPath, del string) (string, []int) {
 }
 
 // JSONArrByIPath :
-func JSONArrByIPath(s, iPath, del string, mapFT *map[string][]string) (arrNames []string, arrCnts []int, nextIPaths []string) {
+func JSONArrByIPath(s, iPath, del string, mFT *map[string][]string) (arrNames []string, arrCnts []int, nextIPaths []string) {
 	path, indices := IPathToPathIndices(iPath, del)
 	// fPln("indices:", indices)
-	leaves := (*mapFT)[path]
+	leaves := (*mFT)[path]
 	for _, leaf := range leaves {
 		// fPln(leaf)
 		LEAF := Str(leaf)
@@ -285,18 +287,18 @@ func JSONArrByIPath(s, iPath, del string, mapFT *map[string][]string) (arrNames 
 }
 
 // JSONWholeArrByIPathByR :
-func JSONWholeArrByIPathByR(s, iPath, del, id string, mapFT *map[string][]string, mapIPathNID *map[string]struct {
+func JSONWholeArrByIPathByR(s, iPath, del, id string, mFT *map[string][]string, mIPathNID *map[string]struct {
 	Count int
 	ID    string
 }) {
 
-	PC(mapIPathNID == nil, fEf("result mapIPathNID is not initialized"))
-	arrNames, arrCnts, subIPaths := JSONArrByIPath(s, iPath, del, mapFT)
+	PC(mIPathNID == nil, fEf("result mapIPathNID is not initialized"))
+	arrNames, arrCnts, subIPaths := JSONArrByIPath(s, iPath, del, mFT)
 	PC(len(arrNames) != len(arrCnts), fEf("error in JSONArrByIPath"))
 
 	nNames := len(arrNames)
 	for i := 0; i < nNames; i++ {
-		(*mapIPathNID)[iPath+del+arrNames[i]] = struct {
+		(*mIPathNID)[iPath+del+arrNames[i]] = struct {
 			Count int
 			ID    string
 		}{
@@ -305,23 +307,23 @@ func JSONWholeArrByIPathByR(s, iPath, del, id string, mapFT *map[string][]string
 		}
 	}
 	for _, subIPath := range subIPaths {
-		JSONWholeArrByIPathByR(s, subIPath, del, id, mapFT, mapIPathNID)
+		JSONWholeArrByIPathByR(s, subIPath, del, id, mFT, mIPathNID)
 	}
 }
 
 // JSONArrInfo :
-func JSONArrInfo(s, xpath, del, id string, mapFT *map[string][]string) (*map[string][]string, *map[string]struct {
+func JSONArrInfo(s, xpath, del, id string, mFT *map[string][]string) (*map[string][]string, *map[string]struct {
 	Count int
 	ID    string
 }) {
-	if mapFT == nil {
-		mapFT = &map[string][]string{}
-		JSONFamilyTree(s, xpath, del, mapFT)
+	if mFT == nil {
+		mFT = &map[string][]string{}
+		JSONFamilyTree(s, xpath, del, mFT)
 	}
 
 	// fPln(" ------------------------------------------------- ")
 
-	keys := GetMapKeys(*mapFT).([]string)
+	keys := GetMapKeys(*mFT).([]string)
 	// w.FunSortLess = func(a, b interface{}) bool { //                ** must directly touch package's function variable **
 	// 	return sCnt(a.(string), del) < sCnt(b.(string), del)
 	// }
@@ -334,13 +336,15 @@ func JSONArrInfo(s, xpath, del, id string, mapFT *map[string][]string) (*map[str
 	PC(!ok, fEf("Invalid path"))
 
 	iRoot := root.(string) + "#1"
-	mapIPathNID := &map[string]struct {
+	mIPathNID := &map[string]struct {
 		Count int
 		ID    string
 	}{}
-	JSONWholeArrByIPathByR(s, iRoot, del, id, mapFT, mapIPathNID)
-	return mapFT, mapIPathNID
+	JSONWholeArrByIPathByR(s, iRoot, del, id, mFT, mIPathNID)
+	return mFT, mIPathNID
 }
+
+// --------------------------------------------------------------------------------------------- //
 
 // JSONMakeObj :
 func JSONMakeObj(s, obj, property string, value interface{}, overwrite, mustArr bool) string {
