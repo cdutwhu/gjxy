@@ -11,37 +11,35 @@ func TestJSONChild(t *testing.T) {
 	s := Str(jsonBytes)
 	s.SetEnC()
 
-	{
-		// fPln(JSONXPathValue(s.V(), "abc ~ subject", " ~ ", 1, 1))
-		// fPln(JSONXPathValue(s.V(), "subject", " ~ ", 1))
+	// {
+	// 	// fPln(JSONXPathValue(s.V(), "abc ~ subject", " ~ ", 1, 1))
+	// 	// fPln(JSONXPathValue(s.V(), "subject", " ~ ", 1))
 
-		// mapFT := &map[string][]string{}
-		// JSONFamilyTree(s, "xapi", " ~ ", mapFT)
-		// fPln(mapFT)
+	// 	// mapFT := &map[string][]string{}
+	// 	// JSONFamilyTree(s, "xapi", " ~ ", mapFT)
+	// 	// fPln(mapFT)
 
-		_, _, json := JSONWrapRoot(s.V(), "xapi")
+	// 	_, _, json := JSONWrapRoot(s.V(), "xapi")
 
-		fPln(" ----------------------------------------------- ")
+	// 	fPln(" ----------------------------------------------- ")
 
-		mFT, mArrInfo := JSONArrInfo(json, "", " ~ ", "GUID", nil)
-		for k, v := range *mFT {
-			fPln(k, v)
-		}
+	// 	mFT, mArrInfo := JSONArrInfo(json, "", " ~ ", "GUID", nil)
+	// 	for k, v := range *mFT {
+	// 		fPln(k, v)
+	// 	}
 
-		fPln(" ----------------------------------------------- ")
+	// 	fPln(" ----------------------------------------------- ")
 
-		for k, v := range *mArrInfo {
-			fPln(k, v)
-		}
+	// 	for k, v := range *mArrInfo {
+	// 		fPln(k, v)
+	// 	}
 
-		fPln(" ----------------------------------------------- ")
-	}
+	// 	fPln(" ----------------------------------------------- ")
+	// }
 
-	jsonSample := ` [ 1, "a", 123, ["ab"], true, false, true, null, null ] `
-	fPln(IsJSON(jsonSample))
-	fPln(IsJSONArray(jsonSample))
-
-	return
+	// jsonSample := ` [ 1, "a", 123, ["ab"], true, false, true, null, null ] `
+	// fPln(IsJSON(jsonSample))
+	// fPln(IsJSONArray(jsonSample))
 
 	// jsonSample := `{
 	// 	"ROOT" : {
@@ -49,9 +47,9 @@ func TestJSONChild(t *testing.T) {
 	// 	    "test": [ 1, 3, 4 ]
 	// 	}
 	// }`
-	jsonSample = `{ "score" : 123, "age": 10  }`
-	fPf("IsJSONSingle :")
-	fPln(IsJSONSingle(jsonSample))
+	// jsonSample = `{ "score" : 123, "age": 10  }`
+	// fPf("IsJSONSingle :")
+	// fPln(IsJSONSingle(jsonSample))
 	// fPln(jsonSample.JSONChildValue("root"))
 	// fPln(jsonSample.JSONWrapRoot("Root"))
 
@@ -96,13 +94,13 @@ func TestJSONChild(t *testing.T) {
 	// 	}
 	// }
 
-	// {
-	// 	children := s.JSONObjChildren()
-	// 	fPln(children)
-	// 	if len(children) != 10 {
-	// 		t.Fatalf("JSONChildren() Error <%d>\n", len(children))
-	// 	}
-	// }
+	{
+		children := JSONObjChildren(s.V())
+		fPln(children)
+		// if len(children) != 10 {
+		// 	t.Fatalf("JSONChildren() Error <%d>\n", len(children))
+		// }
+	}
 }
 
 func TestJSONMake(t *testing.T) {
@@ -117,7 +115,7 @@ func TestJSONMake(t *testing.T) {
 	JSONMakeIPath(mIPathObj, "ROOT", "GNAME", "WORLD 2", false)
 	JSONMakeIPath(mIPathObj, "ROOT.StaffPersonal#1", "name", "hello world", false)
 	JSONMakeIPath(mIPathObj, "ROOT.StaffPersonal#1", "fname", "world", false)
-	JSONMakeIPath(mIPathObj, "ROOT.StaffPersonal#1", "gname", "hello", false)	
+	JSONMakeIPath(mIPathObj, "ROOT.StaffPersonal#1", "gname", "hello", false)
 	JSONMakeIPath(mIPathObj, "ROOT.StaffPersonal#2", "NAME", "HELLO WORLD", true)
 	JSONMakeIPath(mIPathObj, "ROOT.StaffPersonal#2", "FNAME", "WORLD", false)
 	JSONMakeIPath(mIPathObj, "ROOT.StaffPersonal#2", "GNAME", "HELLO", false)
@@ -158,7 +156,7 @@ func TestJSONMake(t *testing.T) {
 	// fPln("1", root)
 
 	// root, ok = JSONBuildObj(root, "root", "StaffPersonal", StaffPersonal, true)
-	// fPln("1", root, ok)	
+	// fPln("1", root, ok)
 }
 
 func TestJSONObjectMerge(t *testing.T) {

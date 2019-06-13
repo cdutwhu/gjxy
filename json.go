@@ -118,24 +118,30 @@ func JSONChildValue(s, child string) (content string, cType JSONTYPE) {
 
 AGAIN:
 	L := Str(s).L()
-	if ok, start, _ := Str(s).SearchStrsIgnore(child, ":", BLANK); ok {
+	// if ok, start, _ := Str(s).SearchStrsIgnore(child, ":", BLANK); ok {
+	if start := Str(s).Idx(child + ":"); start >= 0 {
 		above := Str(s).S(0, start, L).V()
 		sBelow := Str(s).S(start, ALL, L)
 		if sCnt(above, "{")-sCnt(above, "}") == 1 { // *** TRUELY FOUND ( Object OR Value ) ***
-			if ok, s, _ := sBelow.SearchStrsIgnore(":", "{", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //         *** object ***
+			// if ok, s, _ := sBelow.SearchStrsIgnore(":", "{", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //         *** object ***
+			if s := sBelow.Idx(": {"); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //         *** object ***
 				str, _, _ := sBelow.BracketsPos(BCurly, 1, 1)
 				content, cType = str.V(), JT_OBJ
-			} else if ok, s, _ := sBelow.SearchStrsIgnore(":", "[", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //  *** array ***
+				// } else if ok, s, _ := sBelow.SearchStrsIgnore(":", "[", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //  *** array ***
+			} else if s := sBelow.Idx(": ["); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //  *** array ***
 				str, _, _ := sBelow.BracketsPos(BBox, 1, 1)
 				content, cType = str.V(), JT_ARR
-			} else if ok, s, _ := sBelow.SearchStrsIgnore(":", "\"", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** string ***
+				// } else if ok, s, _ := sBelow.SearchStrsIgnore(":", "\"", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** string ***
+			} else if s := sBelow.Idx(": \""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { // *** string ***
 				str, _, _ := sBelow.QuotesPos(QDouble, 2)
 				//content, cType = str.RmQuotes(QDouble).V(), JT_STR
 				content, cType = str.V(), JT_STR //                      ** keep string value's quotations **
-			} else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, DigStrArr, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** number ***
+				// } else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, DigStrArr, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** number ***
+			} else if s := sBelow.IdxAnyInRange(": ", DigStrArr, ""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //   *** number ***
 				_, value := sBelow.KeyValuePair(":", BLANK+",{", BLANK+",}", true, true)
 				content, cType = value.V(), JT_NUM
-			} else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, []string{"true", "false"}, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** bool ***
+				// } else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, []string{"true", "false"}, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** bool ***
+			} else if s := sBelow.IdxAnyInRange(": ", []string{"true", "false"}, ""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { // *** bool ***
 				_, value := sBelow.KeyValuePair(":", BLANK+",{", BLANK+",}", true, true)
 				content, cType = value.V(), JT_BOOL
 			} else {
@@ -193,8 +199,8 @@ func JSONObjChildren(s string) (children []string) {
 	inCurly := Str(s).T(BLANK).RmBrackets(BCurly).T(BLANK)
 
 	posList := []int{}
-	starts, _ := inCurly.Indices2StrsIgnore("\"", ":", BLANK) //         *** slow, flexible ***
-	// starts := inCurly.Indices(`":`) //                                *** fast, but must be `":` ***
+	// starts, _ := inCurly.Indices2StrsIgnore("\"", ":", BLANK) //   *** slow, flexible ***
+	starts := inCurly.Indices(`":`) //                                *** fast, but must be `":` ***
 	for _, p := range starts {
 		if inCurly.BracketDepth(BCurly, p) == 0 {
 			posList = append(posList, p)
