@@ -82,9 +82,9 @@ func YAMLLevel(line string) int {
 			return i / 2
 		}
 	}
-
-	panic("Getting YAMLLevel Error")
-	// return -1
+	
+	PC(true, fEf("Getting YAMLLevel Error"))
+	return -1
 }
 
 // YAMLLineInfo :

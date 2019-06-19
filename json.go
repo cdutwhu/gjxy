@@ -86,8 +86,8 @@ func IsJSONArray(s string) (ok bool, eleType JSONTYPE, n int, eles []string) {
 			for _, b := range sSpl(inBox.V(), ",") {
 				eles = append(eles, Str(b).T(BLANK).V())
 			}
-		default:
-			panic("Not implemented")
+		default:			
+			PC(true, fEf("Not implemented"))
 		}
 
 	} else {
@@ -144,8 +144,8 @@ AGAIN:
 			} else if s := sBelow.IdxAnyInRange(": ", []string{"true", "false"}, ""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { // *** bool ***
 				_, value := sBelow.KeyValuePair(":", BLANK+",{", BLANK+",}", true, true)
 				content, cType = value.V(), JT_BOOL
-			} else {
-				panic("not implemented")
+			} else {				
+				PC(true, fEf("Not implemented"))
 			}
 		}
 

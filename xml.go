@@ -30,7 +30,8 @@ func XMLTagEle(xml, tag string) (string, int, int) {
 		return XML.S(s, sNext).V(), s, sNext
 	}
 
-	panic("Invalid XML")
+	PC(true, fEf("Invalid XML"))
+	return "", -1, -1
 }
 
 // XMLTagEleEx : idx from 1
@@ -52,7 +53,8 @@ func XMLTagEleEx(xml, tag string, idx int) (string, int) {
 		}
 		esum += e
 	}
-	panic("Should not be here!")
+	PC(true, fEf("Should NOT Be Here!"))
+	return "", -1
 }
 
 // XMLXPathEle :
