@@ -72,7 +72,7 @@ func XMLXPathEle(xml, xpath, del string, indices ...int) (ele string, nArr int) 
 }
 
 // XMLAttributes is (ONLY LIKE  <SchoolInfo RefId="D3F5B90C-D85D-4728-8C6F-0D606070606C" Type="LGL">)
-func XMLAttributes(xmlele, attrPF string) (attributes, attriValues []string) { //       *** 'map' may cause mis-order, so use slice
+func XMLAttributes(xmlele string) (attributes, attriValues []string) { //       *** 'map' may cause mis-order, so use slice
 	XMLELE := Str(xmlele).T(BLANK)
 	PC(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Not a valid XML section"))
 
