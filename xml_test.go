@@ -45,7 +45,7 @@ func TestXML(t *testing.T) {
 
 	return
 
-	fPln(XMLAttributes(str, "-"))
+	fPln(XMLAttributes(str))
 	fPln(" A --------------------------------------- ")
 
 	fPln(XMLChildren(str, true))

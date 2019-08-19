@@ -13,7 +13,7 @@ func IsJSON(s string) bool {
 
 // JSONFstEle : The first json child                                                            &
 func JSONFstEle(s string) string {
-	PC(!IsJSON(s), fEf("Invalid JSON"))
+	// pc(!IsJSON(s), fEf("Invalid JSON"))
 	str := Str(s).T(BLANK).RmBrackets(BCurly).T(BLANK)
 	str = str.STo(":").T(BLANK)
 	return str.RmQuotes(QDouble).V()
@@ -21,7 +21,7 @@ func JSONFstEle(s string) string {
 
 // IsJSONSingle :
 func IsJSONSingle(s string) (ok bool, tag string) {
-	PC(!IsJSON(s), fEf("Invalid JSON"))
+	// pc(!IsJSON(s), fEf("Invalid JSON"))
 	S := Str(s).T(BLANK)
 	if S.C(0) == '{' && S.C(LAST) == '}' {
 		S = S.S(1, ALL-1).T(BLANK)
@@ -40,58 +40,83 @@ func IsJSONSingle(s string) (ok bool, tag string) {
 	return
 }
 
-// IsJSONArray : Array Info be valid only on single-type elements.
-func IsJSONArray(s string) (ok bool, eleType JSONTYPE, n int, eles []string) {
-	PC(!IsJSON(s), fEf("Invalid JSON"))
+// IsJSONArrOnFmtL0 is
+func IsJSONArrOnFmtL0(fj string) (ok bool, eleType JTYPE, n int, eles []string) {
+	if fj[0] == '[' {
+		ok, eleType = true, J_UNK
+		idxS, idxE := []int{}, []int{}
+		objS, objE := "\n  {", "\n  }"
+		arrS, arrE := "\n  [", "\n  ]"
+		l := len(fj)
+		for i := 0; i+4 <= l; i++ {
+			switch fj[i : i+4] {
+			case objS, arrS:
+				idxS = append(idxS, i+3)
+			case objE, arrE:
+				idxE = append(idxE, i+3)
+			}
+		}
+		if n = len(idxS); n > 0 {
+			c := rune(fj[idxS[0]])
+			eleType = matchAssign(c, '{', '[', J_OBJ, J_ARR).(JTYPE)
+			for i := 0; i < n; i++ {
+				start, end := idxS[i], idxE[i]
+				eles = append(eles, fj[start:end+1])
+			}
+		}
+	}
+	return
+}
+
+// IsJSONArr : Array Info be valid only on single-type elements.
+func IsJSONArr(s string) (ok bool, eleType JTYPE, n int, eles []string) {
+	// pc(!IsJSON(s), fEf("Invalid JSON"))
 	S := Str(s).T(BLANK)
 	if S.C(0) == '[' && S.C(LAST) == ']' {
-
 		ok = true
-
 		inBox := S.RmBrackets(BBox).T(BLANK)
 		if inBox == "" {
-			eleType, n, eles = JT_UNK, 0, []string{}
+			eleType, n, eles = J_UNK, 0, []string{}
 			return
 		}
-
 		switch inBox.C(0) {
 		case '{':
-			eleType, n = JT_OBJ, inBox.BracketPairCount(BCurly)
+			eleType, n = J_OBJ, inBox.BracketPairCount(BCurly)
 			for i := 1; i <= n; i++ {
 				obj, _, r := inBox.BracketsPos(BCurly, 1, 1)
 				eles = append(eles, obj.V())
 				inBox = inBox.S(r+1, ALL)
 			}
 		case '[':
-			eleType, n = JT_ARR, inBox.BracketPairCount(BBox)
+			eleType, n = J_ARR, inBox.BracketPairCount(BBox)
 			for i := 1; i <= n; i++ {
 				arr, _, r := inBox.BracketsPos(BBox, 1, 1)
 				eles = append(eles, arr.V())
 				inBox = inBox.S(r+1, ALL)
 			}
 		case '"':
-			eleType, n = JT_STR, inBox.QuotePairCount(QDouble)
+			eleType, n = J_STR, inBox.QuotePairCount(QDouble)
 			for i := 1; i <= n; i++ {
 				str, _, r := inBox.QuotesPos(QDouble, 1)
 				eles = append(eles, str.V())
 				inBox = inBox.S(r+1, ALL)
 			}
 		case '1', '2', '3', '4', '5', '6', '7', '8', '9', '0':
-			eleType, n = JT_NUM, sCnt(inBox.V(), ",")+1
+			eleType, n = J_NUM, sCnt(inBox.V(), ",")+1
 			for _, num := range sSpl(inBox.V(), ",") {
 				eles = append(eles, Str(num).T(BLANK).V())
 			}
 		case 't', 'f':
-			eleType, n = JT_BOOL, sCnt(inBox.V(), ",")+1
+			eleType, n = J_BOOL, sCnt(inBox.V(), ",")+1
 			for _, b := range sSpl(inBox.V(), ",") {
 				eles = append(eles, Str(b).T(BLANK).V())
 			}
-		default:			
-			PC(true, fEf("Not implemented"))
+		default:
+			pc(true, fEf("Not implemented"))
 		}
 
 	} else {
-		ok, eleType, n, eles = false, JT_UNK, -1, nil
+		ok, eleType, n, eles = false, J_UNK, -1, nil
 	}
 	return
 }
@@ -102,17 +127,17 @@ func JSONWrapRoot(s, rootExt string) (root string, ext bool, extJSON string) {
 		return tag, false, s
 	}
 	root, ext, extJSON = rootExt, true, fSf(`{ "%s": %s }`, rootExt, s)
-	PC(!IsJSON(extJSON), fEf("JSONWrapRoot error"))
+	// pc(!IsJSON(extJSON), fEf("JSONWrapRoot error"))
 	return
 }
 
 // JSONChildValue :                                                                                   ?
-func JSONChildValue(s, child string) (content string, cType JSONTYPE) {
+func JSONChildValue(s, child string) (content string, cType JTYPE) {
 	if s == "" {
-		return "", JT_UNK
+		return "", J_UNK
 	}
 
-	PC(!IsJSON(s), fEf("Invalid JSON"))
+	// pc(!IsJSON(s), fEf("Invalid JSON"))
 	child = Str(child).MkQuotes(QDouble).V()
 	Lc := Str(child).L()
 
@@ -126,26 +151,26 @@ AGAIN:
 			// if ok, s, _ := sBelow.SearchStrsIgnore(":", "{", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //         *** object ***
 			if s := sBelow.Idx(": {"); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //         *** object ***
 				str, _, _ := sBelow.BracketsPos(BCurly, 1, 1)
-				content, cType = str.V(), JT_OBJ
+				content, cType = str.V(), J_OBJ
 				// } else if ok, s, _ := sBelow.SearchStrsIgnore(":", "[", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //  *** array ***
 			} else if s := sBelow.Idx(": ["); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //  *** array ***
 				str, _, _ := sBelow.BracketsPos(BBox, 1, 1)
-				content, cType = str.V(), JT_ARR
+				content, cType = str.V(), J_ARR
 				// } else if ok, s, _ := sBelow.SearchStrsIgnore(":", "\"", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** string ***
 			} else if s := sBelow.Idx(": \""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { // *** string ***
 				str, _, _ := sBelow.QuotesPos(QDouble, 2)
-				//content, cType = str.RmQuotes(QDouble).V(), JT_STR
-				content, cType = str.V(), JT_STR //                      ** keep string value's quotations **
+				//content, cType = str.RmQuotes(QDouble).V(), J_STR
+				content, cType = str.V(), J_STR //                      ** keep string value's quotations **
 				// } else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, DigStrArr, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** number ***
-			} else if s := sBelow.IdxAnyInRange(": ", DigStrArr, ""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //   *** number ***
+			} else if s := sBelow.IdxAnyInRange(": ", DigStrArr[:], ""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //   *** number ***
 				_, value := sBelow.KeyValuePair(":", BLANK+",{", BLANK+",}", true, true)
-				content, cType = value.V(), JT_NUM
+				content, cType = value.V(), J_NUM
 				// } else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, []string{"true", "false"}, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** bool ***
 			} else if s := sBelow.IdxAnyInRange(": ", []string{"true", "false"}, ""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { // *** bool ***
 				_, value := sBelow.KeyValuePair(":", BLANK+",{", BLANK+",}", true, true)
-				content, cType = value.V(), JT_BOOL
-			} else {				
-				PC(true, fEf("Not implemented"))
+				content, cType = value.V(), J_BOOL
+			} else {
+				pc(true, fEf("Not implemented"))
 			}
 		}
 
@@ -161,10 +186,10 @@ AGAIN:
 // If idx is 0, get whole array.
 func JSONChildValueEx(s, child string, idx int) (ele string, nArr int) {
 	content, cType := JSONChildValue(s, child)
-	if cType == JT_ARR {
-		_, eType, n, eles := IsJSONArray(content)
+	if cType == J_ARR {
+		_, eType, n, eles := IsJSONArr(content)
 		nArr = n
-		if idx == 0 || eType == JT_UNK {
+		if idx == 0 || eType == J_UNK {
 			ele = content
 			return
 		}
@@ -178,12 +203,12 @@ func JSONChildValueEx(s, child string, idx int) (ele string, nArr int) {
 // JSONXPathValue : cannot use empty path to get current. indices is from the 1st path-seg's array index.    &
 // if it's not array, use 1; if it is 0 and array, return the whole array
 func JSONXPathValue(s, xpath, del string, indices ...int) (content string, nArr int) {
-	PC(xpath == "", fEf("at least one path must be provided"))
+	pc(xpath == "", fEf("at least one path must be provided"))
 
 	segs := sSpl(xpath, del)
-	PC(len(segs) != len(indices), fEf("path & seg's index count not match"))
+	pc(len(segs) != len(indices), fEf("path & seg's index count not match"))
 	for i := 0; i < len(indices)-1; i++ {
-		PC(indices[i] <= 0, fEf("Only Last index can be 0 to get the whole array content"))
+		pc(indices[i] <= 0, fEf("Only Last index can be 0 to get the whole array content"))
 	}
 
 	for i, seg := range segs {
@@ -195,7 +220,7 @@ func JSONXPathValue(s, xpath, del string, indices ...int) (content string, nArr 
 
 // JSONObjChildren :
 func JSONObjChildren(s string) (children []string) {
-	PC(!IsJSON(s), fEf("Invalid JSON"))
+	// pc(!IsJSON(s), fEf("Invalid JSON"))
 	inCurly := Str(s).T(BLANK).RmBrackets(BCurly).T(BLANK)
 
 	posList := []int{}
@@ -222,7 +247,7 @@ func JSONObjChildren(s string) (children []string) {
 
 // JSONFamilyTree : Use One Sample to get FamilyTree, DO NOT use long array data                             &
 func JSONFamilyTree(s, fName, del string, mFT *map[string][]string) {
-	PC(mFT == nil, fEf("FamilyTree return map is not initialised !"))
+	pc(mFT == nil, fEf("FamilyTree return map is not initialised !"))
 	// fPln(fName) // DEBUG
 
 	if Str(s).T(BLANK).C(0) != '{' && Str(s).T(BLANK).C(LAST) != '}' {
@@ -298,9 +323,9 @@ func JSONWholeArrByIPathByR(s, iPath, del, id string, mFT *map[string][]string, 
 	ID    string
 }) {
 
-	PC(mIPathNID == nil, fEf("result mIPathNID is not initialized"))
+	pc(mIPathNID == nil, fEf("result mIPathNID is not initialized"))
 	arrNames, arrCnts, subIPaths := JSONArrByIPath(s, iPath, del, mFT)
-	PC(len(arrNames) != len(arrCnts), fEf("error in JSONArrByIPath"))
+	pc(len(arrNames) != len(arrCnts), fEf("error in JSONArrByIPath"))
 
 	if len(arrNames) == 0 { //  *** iPath is not array, BUT maybe has children, make new iPaths, then recursive ***
 
@@ -357,7 +382,7 @@ func JSONArrInfo(s, xpath, del, id string, mFT *map[string][]string) (*map[strin
 		return !Str(a.(string)).Contains(del), a
 	})
 	// fPf("ROOT is <%s>\n", root) //                                  *** DEBUG ***
-	PC(!ok, fEf("Invalid path"))
+	pc(!ok, fEf("Invalid path"))
 
 	iRoot := root.(string) + "#1"
 	mIPathNID := &map[string]struct {
@@ -429,13 +454,13 @@ func JSONMakeObj(s, obj, property string, value interface{}, overwrite, mustArr 
 
 // JSONMakeIPath :
 func JSONMakeIPath(mIPathObj map[string]string, iPath, property string, value interface{}, mustArr bool) string {
-	PC(mIPathObj == nil, fEf("mIPathObj is nil"))
+	pc(mIPathObj == nil, fEf("mIPathObj is nil"))
 	if content, ok := mIPathObj[iPath]; ok {
 		mIPathObj[iPath] = JSONMakeObj(content, iPath, property, value, false, mustArr)
 	} else {
 		mIPathObj[iPath] = JSONMakeObj("", iPath, property, value, false, mustArr)
 	}
-	PC(!IsJSON(mIPathObj[iPath]), fEf("<%s>: <%s> is not valid JSON string", iPath, mIPathObj[iPath]))
+	// pc(!IsJSON(mIPathObj[iPath]), fEf("<%s>: <%s> is not valid JSON string", iPath, mIPathObj[iPath]))
 	return mIPathObj[iPath]
 }
 
@@ -448,7 +473,7 @@ func JSONMakeIPathRep(mIPathObj map[string]string, del string) string {
 			break
 		}
 	}
-	PC(RootKey == "", fEf("ROOT error"))
+	pc(RootKey == "", fEf("ROOT error"))
 
 	sort.SliceStable(keys, func(i, j int) bool {
 		return sCnt(keys[i], del) > sCnt(keys[j], del)
@@ -493,14 +518,14 @@ func JSONMakeIPathRep(mIPathObj map[string]string, del string) string {
 
 // JSONObjectMerge :
 func JSONObjectMerge(s, json string) (rst string) {
-	PC((s != "" && !IsJSON(s)) || !IsJSON(json), fEf("Error: Invalid JSON string"))
+	// pc((s != "" && !IsJSON(s)) || !IsJSON(json), fEf("Error: Invalid JSON string"))
 
 	if s == "" {
 		return json
 	}
 
 	root1, root2 := JSONFstEle(s), JSONFstEle(json)
-	PC(root1 != root2, fEf("Error: Different JSON object"))
+	pc(root1 != root2, fEf("Error: Different JSON object"))
 
 	content1, _ := JSONChildValueEx(s, root1, 0)
 	content2, _ := JSONChildValueEx(json, root2, 0)
@@ -508,6 +533,6 @@ func JSONObjectMerge(s, json string) (rst string) {
 	content1, content2 = Str(content1).TR("]"+BLANK).V(), Str(content2).TR("]"+BLANK).V()
 
 	rst = fSf(`{ "%s": [ %s, %s ] }`, root1, content1, content2)
-	PC(!IsJSON(rst), fEf("Error: Json Merge Result"))
+	pc(!IsJSON(rst), fEf("Error: Json Merge Result"))
 	return
 }

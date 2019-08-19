@@ -25,12 +25,13 @@ const (
 )
 
 var (
-	IF   = u.IF
-	PC   = u.PanicOnCondition
-	PE   = u.PanicOnError
-	PE1  = u.PanicOnError1
-	PH   = u.PanicHandle
-	Must = u.Must
+	IF          = u.IF
+	pc          = u.PanicOnCondition
+	pe          = u.PanicOnError
+	pe1         = u.PanicOnError1
+	ph          = u.PanicHandle
+	must        = u.Must
+	matchAssign = u.MatchAssign
 
 	GetMapKeys    = w.GetMapKeys
 	IArrSearchOne = w.IArrSearchOne

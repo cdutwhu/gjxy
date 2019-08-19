@@ -7,9 +7,11 @@ import (
 
 func TestJSONChild(t *testing.T) {
 
-	jsonBytes, _ := ioutil.ReadFile("./json/content.json") // only LF at end of line
+	jsonBytes, _ := ioutil.ReadFile("./json/xapi.json") // only LF at end of line
 	s := Str(jsonBytes)
-	s.SetEnC()
+
+	ok, tp, n, _ := IsJSONArrOnFmtL0(s.V())
+	fPln(ok, tp, n)
 
 	// {
 	// 	// fPln(JSONXPathValue(s.V(), "abc ~ subject", " ~ ", 1, 1))
@@ -39,7 +41,7 @@ func TestJSONChild(t *testing.T) {
 
 	// jsonSample := ` [ 1, "a", 123, ["ab"], true, false, true, null, null ] `
 	// fPln(IsJSON(jsonSample))
-	// fPln(IsJSONArray(jsonSample))
+	// fPln(IsJSONArr(jsonSample))
 
 	// jsonSample := `{
 	// 	"ROOT" : {
@@ -94,13 +96,13 @@ func TestJSONChild(t *testing.T) {
 	// 	}
 	// }
 
-	{
-		children := JSONObjChildren(s.V())
-		fPln(children)
-		// if len(children) != 10 {
-		// 	t.Fatalf("JSONChildren() Error <%d>\n", len(children))
-		// }
-	}
+	// {
+	// 	children := JSONObjChildren(s.V())
+	// 	fPln(children)
+	// 	// if len(children) != 10 {
+	// 	// 	t.Fatalf("JSONChildren() Error <%d>\n", len(children))
+	// 	// }
+	// }
 }
 
 func TestJSONMake(t *testing.T) {

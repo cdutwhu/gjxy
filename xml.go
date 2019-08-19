@@ -3,14 +3,14 @@ package gjxy
 // XMLTag : get the xml string's first tag
 func XMLTag(xml string) string {
 	XML := Str(xml).T(BLANK)
-	PC(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Not a valid XML section"))
+	pc(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Not a valid XML section"))
 	return XML.S(XML.LIdx("</")+2, ALL-1).V()
 }
 
 // XMLTagEle : Looking for the first tag's xml string
 func XMLTagEle(xml, tag string) (string, int, int) {
 	XML := Str(xml).T(BLANK)
-	PC(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Invalid XML"))
+	pc(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Invalid XML"))
 
 	XML = Str(xml) //                                                   *** we have to return original position, so use original xml ***
 	s, sa := XML.Idx(fSf("<%s>", tag)), XML.Idx(fSf("<%s ", tag))
@@ -30,14 +30,14 @@ func XMLTagEle(xml, tag string) (string, int, int) {
 		return XML.S(s, sNext).V(), s, sNext
 	}
 
-	PC(true, fEf("Invalid XML"))
+	pc(true, fEf("Invalid XML"))
 	return "", -1, -1
 }
 
 // XMLTagEleEx : idx from 1
 func XMLTagEleEx(xml, tag string, idx int) (string, int) {
 	const LIMIT = 4096
-	PC(idx > LIMIT || idx < 1, fEf("idx starts from 1, to %d", LIMIT))
+	pc(idx > LIMIT || idx < 1, fEf("idx starts from 1, to %d", LIMIT))
 	esum, rst := 0, ""
 	for i := 1; i <= LIMIT; i++ { //              *** set a limit for searching ***
 		XML := Str(xml).S(esum, ALL)
@@ -53,16 +53,16 @@ func XMLTagEleEx(xml, tag string, idx int) (string, int) {
 		}
 		esum += e
 	}
-	PC(true, fEf("Should NOT Be Here!"))
+	pc(true, fEf("Should NOT Be Here!"))
 	return "", -1
 }
 
 // XMLXPathEle :
 func XMLXPathEle(xml, xpath, del string, indices ...int) (ele string, nArr int) {
-	PC(xpath == "", fEf("At least one path must be provided"))
+	pc(xpath == "", fEf("At least one path must be provided"))
 
 	segs := sSpl(xpath, del)
-	PC(len(segs) != len(indices), fEf("path & seg's index count not match"))
+	pc(len(segs) != len(indices), fEf("path & seg's index count not match"))
 
 	for i, seg := range segs {
 		xml = IF(ele != "", ele, xml).(string)
@@ -74,7 +74,7 @@ func XMLXPathEle(xml, xpath, del string, indices ...int) (ele string, nArr int) 
 // XMLAttributes is (ONLY LIKE  <SchoolInfo RefId="D3F5B90C-D85D-4728-8C6F-0D606070606C" Type="LGL">)
 func XMLAttributes(xmlele string) (attributes, attriValues []string) { //       *** 'map' may cause mis-order, so use slice
 	XMLELE := Str(xmlele).T(BLANK)
-	PC(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Not a valid XML section"))
+	pc(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Not a valid XML section"))
 
 	tag := Str(XMLTag(xmlele))
 	if eol := XMLELE.Idx(`">`) + 1; XMLELE.C(tag.L()+1) == ' ' && eol > tag.L() { //    *** has attributes
@@ -109,7 +109,7 @@ func XMLAttributes(xmlele string) (attributes, attriValues []string) { //       
 // XMLChildren : (NOT search grandchildren)
 func XMLChildren(xmlele string, fNArr bool) (children []string) {
 	XMLELE := Str(xmlele).T(BLANK)
-	PC(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Invalid XML section"))
+	pc(XMLELE == "" || XMLELE.C(0) != '<' || XMLELE.C(LAST) != '>', fEf("Invalid XML section"))
 
 	L := XMLELE.L()
 	skip, childpos, level, inflag := false, []int{}, 0, false
@@ -161,9 +161,9 @@ func XMLChildren(xmlele string, fNArr bool) (children []string) {
 
 // XMLFamilyTree :
 func XMLFamilyTree(xml, fName, del string, mapFT *map[string][]string) {
-	PC(mapFT == nil, fEf("FamilyTree return map is not initialised !"))
+	pc(mapFT == nil, fEf("FamilyTree return map is not initialised !"))
 	XML := Str(xml).T(BLANK)
-	PC(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Invalid XML section"))
+	pc(XML == "" || XML.C(0) != '<' || XML.C(LAST) != '>', fEf("Invalid XML section"))
 
 	fName = IF(fName == "", XMLTag(xml), fName).(string)
 	if children := XMLChildren(xml, false); len(children) > 0 {
@@ -216,9 +216,9 @@ func XMLWholeCntByIPathByR(xml, iPath, del, id string, mapFT *map[string][]strin
 	Count int
 	ID    string
 }) {
-	PC(mapIPathNID == nil, fEf("result <mapIPathNID> is not initialized"))
+	pc(mapIPathNID == nil, fEf("result <mapIPathNID> is not initialized"))
 	arrNames, arrCnts, subIPaths := XMLCntByIPath(xml, iPath, del, mapFT)
-	PC(len(arrNames) != len(arrCnts), fEf("error in XMLCntByIPath"))
+	pc(len(arrNames) != len(arrCnts), fEf("error in XMLCntByIPath"))
 
 	nNames := len(arrNames)
 	for i := 0; i < nNames; i++ {
@@ -249,7 +249,7 @@ func XMLCntInfo(xml, xpath, del, id string, mapFT *map[string][]string) (*map[st
 
 	root := XMLTag(xml)
 	// fPf("ROOT is <%s>\n", root)
-	PC(root == "", fEf("Invalid path"))
+	pc(root == "", fEf("Invalid path"))
 
 	iRoot := root + "#1"
 	mapIPathNID := &map[string]struct {
@@ -297,7 +297,7 @@ func XMLSegPos(xml string, level, index int) (tag, str string, left, right int) 
 	if tagendRel == -1 {
 		tagendRel = s.S(left+1, right).Idx(string(markE3))
 	}
-	PC(tagendRel == -1, fEf("xml error"))
+	pc(tagendRel == -1, fEf("xml error"))
 
 	tag = s.S(left+1, left+1+tagendRel).V()
 	right += Str(tag).L() + 2

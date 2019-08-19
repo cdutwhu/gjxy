@@ -1,19 +1,19 @@
 package gjxy
 
-type JSONTYPE int
+type JTYPE int
 
 var (
-	DigStrArr    = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
-	DigRuneArr   = []rune{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
-	JSONTypeDesc = map[JSONTYPE]string{
-		JT_NULL: "Null",
-		JT_OBJ:  "Object",
-		JT_ARR:  "Array",
-		JT_STR:  "String",
-		JT_NUM:  "Number",
-		JT_BOOL: "Boolean",
-		JT_MIX:  "Mix",
-		JT_UNK:  "Unknown",
+	DigStrArr    = [...]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
+	DigRuneArr   = [...]rune{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
+	JSONTypeDesc = map[JTYPE]string{
+		J_NULL: "Null",
+		J_OBJ:  "Object",
+		J_ARR:  "Array",
+		J_STR:  "String",
+		J_NUM:  "Number",
+		J_BOOL: "Boolean",
+		J_MIX:  "Mix",
+		J_UNK:  "Unknown",
 	}
 	mapJBPos  = make(map[string]int)
 	mapJBKids = make(map[string][]string)
@@ -22,12 +22,12 @@ var (
 const (
 	BLANK = " \t\n\r"
 
-	JT_NULL JSONTYPE = 0
-	JT_OBJ  JSONTYPE = 1
-	JT_ARR  JSONTYPE = 2
-	JT_STR  JSONTYPE = 3
-	JT_NUM  JSONTYPE = 4
-	JT_BOOL JSONTYPE = 5
-	JT_MIX  JSONTYPE = 9
-	JT_UNK  JSONTYPE = 99
+	J_NULL JTYPE = 0
+	J_OBJ  JTYPE = 1
+	J_ARR  JTYPE = 2
+	J_STR  JTYPE = 3
+	J_NUM  JTYPE = 4
+	J_BOOL JTYPE = 5
+	J_MIX  JTYPE = 9
+	J_UNK  JTYPE = 99
 )

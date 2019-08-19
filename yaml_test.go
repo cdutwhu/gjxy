@@ -31,7 +31,7 @@ func TestYAMLValue(t *testing.T) {
 
 func TestYAMLInfo(t *testing.T) {
 	bytes, e := ioutil.ReadFile("./yaml/tempyaml.1.yaml")
-	PE(e)
+	pe(e)
 	info := YAMLInfo(string(bytes), "guid", " ~ ", true)
 	for i, item := range *info {
 		fPf("%02d : %s %-70s %s\n", i, item.ID, item.Path, item.Value)
@@ -40,7 +40,7 @@ func TestYAMLInfo(t *testing.T) {
 
 func TestGetSplittedLines(t *testing.T) {
 	bytes, e := ioutil.ReadFile("./yaml/test.yaml")
-	PE(e)
+	pe(e)
 	rst1, rst2 := YAMLGetSplittedLines(string(bytes))
 	fPln(rst1)
 	fPln(rst2)
