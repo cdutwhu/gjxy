@@ -3,8 +3,8 @@ package gjxy
 type JTYPE int
 
 var (
-	DigStrArr    = [...]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
-	DigRuneArr   = [...]rune{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
+	DigStrArr    = [...]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-"}
+	DigRuneArr   = [...]rune{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-'}
 	JSONTypeDesc = map[JTYPE]string{
 		J_NULL: "Null",
 		J_OBJ:  "Object",
