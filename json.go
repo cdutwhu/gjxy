@@ -143,29 +143,22 @@ func JSONChildValue(s, child string) (content string, cType JTYPE) {
 
 AGAIN:
 	L := Str(s).L()
-	// if ok, start, _ := Str(s).SearchStrsIgnore(child, ":", BLANK); ok {
 	if start := Str(s).Idx(child + ":"); start >= 0 {
 		above := Str(s).S(0, start, L).V()
 		sBelow := Str(s).S(start, ALL, L)
 		if sCnt(above, "{")-sCnt(above, "}") == 1 { // *** TRUELY FOUND ( Object OR Value ) ***
-			// if ok, s, _ := sBelow.SearchStrsIgnore(":", "{", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //         *** object ***
 			if s := sBelow.Idx(": {"); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //         *** object ***
 				str, _, _ := sBelow.BracketsPos(BCurly, 1, 1)
 				content, cType = str.V(), J_OBJ
-				// } else if ok, s, _ := sBelow.SearchStrsIgnore(":", "[", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { //  *** array ***
 			} else if s := sBelow.Idx(": ["); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //  *** array ***
 				str, _, _ := sBelow.BracketsPos(BBox, 1, 1)
 				content, cType = str.V(), J_ARR
-				// } else if ok, s, _ := sBelow.SearchStrsIgnore(":", "\"", BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** string ***
 			} else if s := sBelow.Idx(": \""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { // *** string ***
 				str, _, _ := sBelow.QuotesPos(QDouble, 2)
-				//content, cType = str.RmQuotes(QDouble).V(), J_STR
-				content, cType = str.V(), J_STR //                      ** keep string value's quotations **
-				// } else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, DigStrArr, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** number ***
+				content, cType = str.V(), J_STR //    ** keep string value's quotations **
 			} else if s := sBelow.IdxAnyInRange(": ", DigStrArr[:], ""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { //   *** number ***
 				_, value := sBelow.KeyValuePair(":", BLANK+",{", BLANK+",}", true, true)
 				content, cType = value.V(), J_NUM
-				// } else if ok, s, _ := sBelow.SearchAny2StrsIgnore([]string{":"}, []string{"true", "false"}, BLANK); ok && sBelow.S(0, s).T(BLANK).L() == Lc { // *** bool ***
 			} else if s := sBelow.IdxAnyInRange(": ", []string{"true", "false"}, ""); s >= 0 && sBelow.S(0, s).T(BLANK).L() == Lc { // *** bool ***
 				_, value := sBelow.KeyValuePair(":", BLANK+",{", BLANK+",}", true, true)
 				content, cType = value.V(), J_BOOL
