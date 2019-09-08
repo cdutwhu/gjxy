@@ -101,7 +101,7 @@ func IsJSONArr(s string) (ok bool, eleType JTYPE, n int, eles []string) {
 				eles = append(eles, str.V())
 				inBox = inBox.S(r+1, ALL)
 			}
-		case '1', '2', '3', '4', '5', '6', '7', '8', '9', '0':
+		case '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-':
 			eleType, n = J_NUM, sCnt(inBox.V(), ",")+1
 			for _, num := range sSpl(inBox.V(), ",") {
 				eles = append(eles, Str(num).T(BLANK).V())

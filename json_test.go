@@ -13,6 +13,10 @@ func TestJSONChild(t *testing.T) {
 	ok, tp, n, _ := IsJSONArrOnFmtL0(s.V())
 	fPln(ok, tp, n)
 
+	jsonSample := ` [ -1, "a", 123, ["ab"], -1, true, false, true, null, null ] `
+	fPln(IsJSON(jsonSample))
+	fPln(IsJSONArr(jsonSample))
+
 	// {
 	// 	// fPln(JSONXPathValue(s.V(), "abc ~ subject", " ~ ", 1, 1))
 	// 	// fPln(JSONXPathValue(s.V(), "subject", " ~ ", 1))
@@ -38,10 +42,6 @@ func TestJSONChild(t *testing.T) {
 
 	// 	fPln(" ----------------------------------------------- ")
 	// }
-
-	// jsonSample := ` [ 1, "a", 123, ["ab"], true, false, true, null, null ] `
-	// fPln(IsJSON(jsonSample))
-	// fPln(IsJSONArr(jsonSample))
 
 	// jsonSample := `{
 	// 	"ROOT" : {
