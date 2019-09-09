@@ -17,6 +17,7 @@ type (
 )
 
 const (
+	BRound  = w.BRound
 	BCurly  = w.BCurly
 	BBox    = w.BBox
 	QDouble = w.QDouble
@@ -32,6 +33,7 @@ var (
 	ph          = u.PanicHandle
 	must        = u.Must
 	matchAssign = u.MatchAssign
+	trueAssign  = u.TrueAssign
 
 	GetMapKeys    = w.GetMapKeys
 	IArrSearchOne = w.IArrSearchOne
