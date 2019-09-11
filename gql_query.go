@@ -4,9 +4,24 @@ import (
 	"errors"
 )
 
+// RmQryCmts :
+func RmQryCmts(qry string) string {
+	i := 0
+	qrybuf := make([]rune, len(qry)+1)
+	flagAdd := true
+	for _, uc := range qry {
+		flagAdd = matchAssign(uc, '#', '\n', false, true, flagAdd).(bool)
+		if flagAdd {
+			qrybuf[i] = uc
+			i++
+		}
+	}
+	return string(qrybuf)
+}
+
 // Get1stObjInQry :
 func Get1stObjInQry(qry string) (obj string, err error) {
-	Sq := Str(qry).T(BLANK)
+	Sq := Str(RmQryCmts(qry)).T(BLANK)
 	_, curly1, _ := Sq.BracketsPos(BCurly, 1, 1)
 	_, curly2, _ := Sq.BracketsPos(BCurly, 2, 1)
 	_, round1, _ := Sq.BracketsPos(BRound, 1, 1)

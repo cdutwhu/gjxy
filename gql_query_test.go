@@ -52,7 +52,11 @@ const q6 = `query HeroNameAndFriends($episode: Episode) {
 	}
   }
 `
-const q7 = `query HeroNameAndFriends($episode: Episode) {
+const q7 = ` # this is a comment test
+# this is another comment test
+##
+
+query HeroNameAndFriends($episode: Episode) {
 	newName: AAAhero(episode: $episode) {
 	  name
 	  friends {
@@ -64,8 +68,16 @@ const q7 = `query HeroNameAndFriends($episode: Episode) {
 
 var Qs = []string{q0, q1, q2, q3, q4, q5, q6, q7}
 
-func TestGet1stObjInQry(t *testing.T) {
+func TestRmQryCmts(t *testing.T) {
 	for i := 0; i <= 7; i++ {
-		fPln(Get1stObjInQry(Qs[i]))
+		fPln(RmQryCmts(Qs[i]))
+	}
+}
+
+func TestGet1stObjInQry(t *testing.T) {
+	for j := 0; j < 100; j++ {
+		for i := 0; i <= 7; i++ {
+			fPln(Get1stObjInQry(Qs[i]))
+		}
 	}
 }

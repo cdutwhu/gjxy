@@ -58,7 +58,7 @@ func IsJSONArrOnFmtL0(fj string) (ok bool, eleType JTYPE, n int, eles []string) 
 		}
 		if n = len(idxS); n > 0 {
 			c := rune(fj[idxS[0]])
-			eleType = matchAssign(c, '{', '[', J_OBJ, J_ARR).(JTYPE)
+			eleType = matchAssign(c, '{', '[', J_OBJ, J_ARR, c).(JTYPE)
 			for i := 0; i < n; i++ {
 				start, end := idxS[i], idxE[i]
 				eles = append(eles, fj[start:end+1])
