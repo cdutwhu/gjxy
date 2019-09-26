@@ -365,7 +365,7 @@ func JSONArrInfo(s, xpath, del, id string, mFT *map[string][]string) (*map[strin
 
 	// fPln(" ------------------------------------------------- ")
 
-	keys := GetMapKeys(*mFT).([]string)
+	keys := MapKeys(*mFT).([]string)
 	// w.FunSortLess = func(a, b interface{}) bool { //                ** must directly touch package's function variable **
 	// 	return sCnt(a.(string), del) < sCnt(b.(string), del)
 	// }
@@ -459,7 +459,7 @@ func JSONMakeIPath(mIPathObj map[string]string, iPath, property string, value in
 
 // JSONMakeIPathRep :
 func JSONMakeIPathRep(mIPathObj map[string]string, del string) string {
-	RootKey, keys := "", GetMapKeys(mIPathObj).([]string)
+	RootKey, keys := "", MapKeys(mIPathObj).([]string)
 	for _, k := range keys {
 		if !Str(k).Contains(del) {
 			RootKey = k

@@ -34,8 +34,8 @@ var (
 	must        = u.Must
 	matchAssign = u.MatchAssign
 	trueAssign  = u.TrueAssign
+	MapKeys     = u.MapKeys
 
-	GetMapKeys    = w.GetMapKeys
 	IArrSearchOne = w.IArrSearchOne
 	IArrEleIn     = w.IArrEleIn
 	IArrIsSameEle = w.IArrIsSameEle
