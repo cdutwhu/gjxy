@@ -396,7 +396,10 @@ func JSONMakeObj(s, obj, property string, value interface{}, overwrite, mustArr 
 
 	switch value.(type) {
 	case string:
-		if !IArrEleIn(Str(value.(string)).C(0), C32s{'{', '['}) {
+		// if !IArrEleIn(Str(value.(string)).C(0), C32s{'{', '['}) {
+		// 	value = Str(value.(string)).MkQuotes(QDouble).V()
+		// }
+		if !XIn(Str(value.(string)).C(0), []rune{'{', '['}) {
 			value = Str(value.(string)).MkQuotes(QDouble).V()
 		}
 	}
@@ -410,7 +413,8 @@ func JSONMakeObj(s, obj, property string, value interface{}, overwrite, mustArr 
 
 	if start, ok := mapJBPos[obj]; ok { //                                *** existing iPath to add ***
 
-		if IArrEleIn(property, Strs(mapJBKids[obj])) { //                 *** same property, to merge / overwrite ***
+		// if IArrEleIn(property, Strs(mapJBKids[obj])) { //  *** same property, to merge / overwrite ***
+		if XIn(property, mapJBKids[obj]) { //                 *** same property, to merge / overwrite ***
 			// fPln(property, "did before, merge / overwrite into array")
 
 			for _, find := range Str(s).Indices(property) {

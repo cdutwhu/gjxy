@@ -228,7 +228,8 @@ func YAMLJoinSplittedLines(yaml string) string {
 	lines := sFF(yaml, func(c rune) bool { return c == '\n' })
 	newLines := []string{}
 	for i, line := range lines {
-		if IArrEleIn(i, I32s(iLines)) {
+		// if IArrEleIn(i, I32s(iLines)) {
+		if XIn(i, iLines) {
 			newLines[len(newLines)-1] += " " + Str(line).T(BLANK).V()
 		} else {
 			newLines = append(newLines, line)

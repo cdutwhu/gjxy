@@ -35,9 +35,9 @@ var (
 	matchAssign = u.MatchAssign
 	trueAssign  = u.TrueAssign
 	MapKeys     = u.MapKeys
+	XIn         = u.XIn
 
 	IArrSearchOne = w.IArrSearchOne
-	IArrEleIn     = w.IArrEleIn
 	IArrIsSameEle = w.IArrIsSameEle
 	IArrFoldRep   = w.IArrFoldRep
 	Min           = w.Min
